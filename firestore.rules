@@ -1,0 +1,28 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users collection
+    match /users/{userId} {
+      allow read: if true; // Or restrict to auth
+      allow create: if !exists(/databases/$(database)/documents/users/$(userId)) &&
+                       request.resource.data.username is string &&
+                       request.resource.data.pin is string && request.resource.data.pin.size() == 6 &&
+                       request.resource.data.pin.matches('^[0-9]+$') &&
+                       request.resource.data.username.size() >= 3 && <= 15 &&
+                       request.resource.data.username.matches('^[a-z0-9_]+$');
+      allow update: if request.auth != null; // Or tighter checks
+      allow delete: if false;
+    }
+
+    // Messages collection
+    match /messages/{messageId} {
+      allow read, create: if true; 
+      allow update, delete: if false;
+    }
+
+    // Fallback for all else
+    match /{document=**} {
+      allow read, write: if false; // Deny by default
+    }
+  }
+}

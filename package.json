@@ -1,0 +1,18 @@
+{
+  "name": "terminal-chat",
+  "version": "1.0.0",
+  "description": "A terminal-style chat application",
+  "scripts": {
+    "start": "NODE_OPTIONS='--no-deprecation' npx http-server -p 8080",
+    "build:css": "npx tailwindcss -i ./input.css -o ./styles.css --watch",
+    "dev": "concurrently \"npm run build:css\" \"npm start\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "tailwindcss": "^3.3.0",
+    "concurrently": "^8.2.1"
+  }
+}

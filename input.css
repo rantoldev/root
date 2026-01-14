@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+    .glow {
+        text-shadow: 0 0 5px #00ff00;
+        animation: glow 2s ease-in-out infinite alternate;
+    }
+
+    .terminal-text {
+        color: #00ff00;
+        text-shadow: 0 0 5px #00ff00;
+    }
+
+    .terminal-border {
+        border: 1px solid #00ff00;
+        box-shadow: 0 0 10px #00ff00;
+    }
+
+    .cursor-blink {
+        animation: blink 1s infinite;
+    }
+}
+
+@keyframes glow {
+    from {
+        text-shadow: 0 0 5px #00ff00;
+    }
+
+    to {
+        text-shadow: 0 0 10px #00ff00, 0 0 15px #00ff00;
+    }
+}
+
+@keyframes blink {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.message-animation {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+        transform: translateX(-5px);
+    }
+
+    20%,
+    40%,
+    60%,
+    80% {
+        transform: translateX(5px);
+    }
+}
+
+.shake {
+    animation: shake 0.5s;
+}
