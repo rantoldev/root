@@ -30,3 +30,4 @@ Whether you're monitoring contract data via Helius or tracking $TERM on Pump.fun
 ---
 
 *Remember: There is no spoon... and there might be a rug pull. Choose wisely.*
+# term
