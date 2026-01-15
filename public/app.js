@@ -197,7 +197,7 @@ redPillBtn.addEventListener('click', () => {
     pauseTyping(5000);
     addToTerminal("> Executing: ./take_red_pill");
     setTimeout(() => {
-        window.open(`https://pump.fun/coin/${GLOBAL_PUMP_CA}`, '_blank');
+        window.open('https://pump.fun/profile/g25uaj', '_blank');
     }, 500);
 });
 
