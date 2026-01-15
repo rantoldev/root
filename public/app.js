@@ -65,7 +65,43 @@ function toggleSound() {
         btn.classList.add('opacity-50');
     }
 }
+
 window.toggleSound = toggleSound;
+
+function showNotification(message) {
+    const toast = document.getElementById('notification-toast');
+    if (toast) {
+        toast.textContent = message;
+        toast.classList.add('show');
+
+        // Play a sound if enabled (optional, but fits the theme)
+        // const audio = new Audio('assets/sounds/click.mp3'); 
+        // if(soundEnabled) audio.play().catch(e => {});
+
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3000);
+    }
+}
+
+window.copyCA = function () {
+    if (GLOBAL_PUMP_CA) {
+        navigator.clipboard.writeText(GLOBAL_PUMP_CA).then(() => {
+            showNotification(`COPIED: ${GLOBAL_PUMP_CA}`);
+
+            // Visual feedback on the button itself (optional but nice)
+            const caBox = document.querySelector('.ca-box');
+            if (caBox) {
+                caBox.classList.add('neon-border');
+                setTimeout(() => caBox.classList.remove('neon-border'), 500);
+            }
+        }).catch(err => {
+            console.error('Failed to copy: ', err);
+            showNotification("COPY FAILED");
+        });
+    }
+};
+
 
 // Narrative
 const narrativeLines = [
@@ -134,6 +170,27 @@ function startNarrative() {
     }
 }
 
+// Header Metrics Animation
+function updateSystemMetrics() {
+    const cpuBar = document.getElementById('cpu-bar');
+    const cpuVal = document.getElementById('cpu-val');
+    const ramBar = document.getElementById('ram-bar');
+    const ramVal = document.getElementById('ram-val');
+
+    if (cpuBar && cpuVal && ramBar && ramVal) {
+        setInterval(() => {
+            const cpu = Math.floor(Math.random() * 40) + 10; // 10-50%
+            const ram = Math.floor(Math.random() * 30) + 40; // 40-70%
+
+            cpuBar.style.width = `${cpu}%`;
+            cpuVal.textContent = `${cpu}%`;
+
+            ramBar.style.width = `${ram}%`;
+            ramVal.textContent = `${ram}%`;
+        }, 2000);
+    }
+}
+
 // Countdown
 const launchTime = new Date();
 launchTime.setHours(launchTime.getHours() + 1); // Demo: 1 hour from now
@@ -141,14 +198,20 @@ launchTime.setHours(launchTime.getHours() + 1); // Demo: 1 hour from now
 function updateCountdown() {
     const now = new Date();
     const diff = launchTime - now;
+    let timeStr = 'LAUNCHED';
+
     if (diff > 0) {
         const hours = Math.floor(diff / (1000 * 60 * 60));
         const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-        countdownTimer.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    } else {
-        countdownTimer.textContent = 'LAUNCHED';
+        timeStr = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     }
+
+    const timerMobile = document.getElementById('countdownTimerMobile');
+    const timerDesktop = document.getElementById('countdownTimerDesktop');
+
+    if (timerMobile) timerMobile.textContent = timeStr;
+    if (timerDesktop) timerDesktop.textContent = timeStr;
 }
 
 // Button interactions
@@ -319,6 +382,31 @@ if (eyeIris && watchingEye) {
 document.addEventListener('DOMContentLoaded', async () => {
     showDashboard();
     setInterval(updateCountdown, 1000); // Only set once
+
+    // Sync CA in header
+    const tokenCASpan = document.getElementById('tokenCA');
+    if (tokenCASpan && typeof GLOBAL_PUMP_CA !== 'undefined') {
+        tokenCASpan.textContent = GLOBAL_PUMP_CA;
+    }
+
+    updateSystemMetrics();
+
+    // Custom Cursor Logic
+    const customCursor = document.getElementById('customCursor');
+    if (customCursor) {
+        document.addEventListener('mousemove', (e) => {
+            customCursor.style.left = e.clientX + 'px';
+            customCursor.style.top = e.clientY + 'px';
+        });
+
+        document.addEventListener('mousedown', () => {
+            customCursor.style.transform = 'translate(-50%, -50%) scale(0.8)';
+        });
+
+        document.addEventListener('mouseup', () => {
+            customCursor.style.transform = 'translate(-50%, -50%) scale(1)';
+        });
+    }
 });
 
 // Make functions globally available (original)

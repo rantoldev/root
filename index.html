@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="data:,">
+    <link rel="icon" href="assets/favicon.jpg">
     <title>TERM - Privacy-Focused Anon Chat</title>
     <!-- Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -38,7 +38,77 @@
             background-color: var(--term-bg);
             color: #eee;
             overflow: hidden;
+            cursor: none;
+            /* Hide default cursor */
         }
+
+        /* Custom Cursor */
+        .custom-cursor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 20px;
+            height: 20px;
+            pointer-events: none;
+            z-index: 10000;
+            transform: translate(-50%, -50%);
+            mix-blend-mode: screen;
+            transition: transform 0.1s ease-out;
+        }
+
+        .cursor-crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            transform: translate(-50%, -50%);
+        }
+
+        .cursor-crosshair::before,
+        .cursor-crosshair::after {
+            content: '';
+            position: absolute;
+            background: var(--term-green);
+            box-shadow: 0 0 10px var(--term-green);
+        }
+
+        .cursor-crosshair::before {
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            transform: translateY(-50%);
+        }
+
+        .cursor-crosshair::after {
+            left: 50%;
+            top: 0;
+            width: 2px;
+            height: 100%;
+            transform: translateX(-50%);
+        }
+
+        .cursor-trail {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 8px;
+            height: 8px;
+            background: rgba(0, 255, 65, 0.5);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            filter: blur(2px);
+            transition: width 0.2s, height 0.2s;
+        }
+
+        /* Hover effect */
+        body:hover .custom-cursor .cursor-trail {
+            width: 15px;
+            height: 15px;
+            background: rgba(0, 255, 65, 0.2);
+        }
+
 
         /* Glassmorphism Classes */
         .glass-panel {
@@ -148,6 +218,35 @@
 
             /* ... truncated keyframes ... */
         }
+
+        /* Notification Toast */
+        #notification-toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 20, 0, 0.9);
+            border: 1px solid var(--term-green);
+            color: var(--term-green);
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-family: 'Source Code Pro', monospace;
+            font-size: 14px;
+            z-index: 10000;
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease, top 0.3s ease;
+        }
+
+        #notification-toast.show {
+            opacity: 1;
+            top: 80px;
+            /* Slide down slightly */
+        }
+
 
         /* Custom Scrollbar */
         ::-webkit-scrollbar {
@@ -488,6 +587,27 @@
                 transform: skew(0deg);
             }
         }
+
+        @keyframes marquee {
+            0% {
+                transform: translateX(100%);
+            }
+
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+
+        .animate-marquee {
+            animation: marquee 30s linear infinite;
+            padding-left: 100%;
+            /* Start off-screen */
+        }
+
+        /* Footer specific glow */
+        .footer-glow {
+            box-shadow: 0 -4px 20px rgba(0, 255, 65, 0.05);
+        }
     </style>
 </head>
 
@@ -495,6 +615,16 @@
     <!-- CRT Effects -->
     <div class="crt-overlay"></div>
     <div class="crt-vignette"></div>
+
+    <!-- Notification Toast -->
+    <div id="notification-toast">WARNING: COPIED TO CLIPBOARD</div>
+
+
+    <!-- Custom Cursor Container -->
+    <div id="customCursor" class="custom-cursor">
+        <div class="cursor-crosshair"></div>
+        <div class="cursor-trail"></div>
+    </div>
 
     <!-- Premium Header -->
     <header
@@ -517,9 +647,30 @@
             <!-- Mobile-only status/countdown container -->
             <div class="flex md:hidden items-center space-x-3 overflow-hidden">
                 <div class="flex flex-col items-end">
-                    <span id="countdownTimer" class="text-green-400 text-[10px] font-mono animate-pulse">00:00:00</span>
+                    <span id="countdownTimerMobile"
+                        class="text-green-400 text-[10px] font-mono animate-pulse">00:00:00</span>
                     <span class="text-green-400 text-[8px] animate-pulse">MATRIX: LOADED</span>
                 </div>
+            </div>
+        </div>
+
+        </div>
+
+        <!-- NEW: System Metrics (Left Side Feature) -->
+        <div class="hidden xl:flex flex-col space-y-1 p-2 border-r border-green-900/30 mr-4">
+            <div class="flex items-center space-x-2">
+                <span class="text-[8px] text-green-700">CPU</span>
+                <div class="w-16 h-1 bg-green-900/30 rounded overflow-hidden">
+                    <div id="cpu-bar" class="h-full bg-green-500 w-1/3 transition-all duration-300"></div>
+                </div>
+                <span id="cpu-val" class="text-[8px] text-green-400 font-mono">34%</span>
+            </div>
+            <div class="flex items-center space-x-2">
+                <span class="text-[8px] text-green-700">RAM</span>
+                <div class="w-16 h-1 bg-green-900/30 rounded overflow-hidden">
+                    <div id="ram-bar" class="h-full bg-green-500 w-2/3 transition-all duration-500"></div>
+                </div>
+                <span id="ram-val" class="text-[8px] text-green-400 font-mono">67%</span>
             </div>
         </div>
 
@@ -535,12 +686,37 @@
         </div>
 
         <div class="hidden md:flex items-center space-x-6">
-            <div id="launchCountdown" class="flex items-center space-x-2">
-                <span id="countdownTimer" class="text-green-400 text-xs font-mono animate-pulse">00:00:00</span>
+            <!-- NEW: Node Map / Net Status (Right Side Feature) -->
+            <div class="hidden lg:block">
+                <div class="border border-green-900/50 bg-black/40 p-1.5 rounded flex items-center space-x-2">
+                    <div class="grid grid-cols-3 gap-0.5">
+                        <div class="w-1 h-1 bg-green-500 rounded-full animate-pulse"></div>
+                        <div class="w-1 h-1 bg-green-800 rounded-full"></div>
+                        <div class="w-1 h-1 bg-green-600 rounded-full"></div>
+                        <div class="w-1 h-1 bg-green-900 rounded-full"></div>
+                        <div class="w-1 h-1 bg-green-400 rounded-full animate-ping"></div>
+                        <div class="w-1 h-1 bg-green-700 rounded-full"></div>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-[8px] text-green-500 font-bold">NET_LATTICE</span>
+                        <span class="text-[7px] text-green-800">NODES: <span class="text-green-300">ACTIVE</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="launchCountdown" class="flex items-center space-x-2 border-l border-green-900/30 pl-4">
+                <div class="flex flex-col items-end">
+                    <span class="text-[8px] text-green-800 uppercase tracking-wider">T-Minus</span>
+                    <span id="countdownTimerDesktop"
+                        class="text-green-400 text-xs font-mono animate-pulse">00:00:00</span>
+                </div>
             </div>
             <div id="connectionStatus" class="flex items-center space-x-2">
-                <span class="text-[10px] text-green-800">MATRIX:</span>
-                <span class="text-green-400 text-xs animate-pulse">LOADED</span>
+                <i class="fas fa-wifi text-[10px] text-green-600 animate-pulse"></i>
+                <div class="flex flex-col">
+                    <span class="text-[8px] text-green-800">Link Status</span>
+                    <span class="text-green-400 text-[10px] font-bold">SECURE</span>
+                </div>
             </div>
         </div>
     </header>
@@ -624,9 +800,44 @@
     </main>
 
     <!-- Footer -->
-    <footer class="mt-8 p-4 border-t border-gray-800 text-center text-gray-500 text-sm">
-        <p class="glitch-text" data-text="Welcome to the Matrix • $TERM Token Launch • Choose Your Pill Wisely">Welcome
-            to the Matrix • $TERM Token Launch • Choose Your Pill Wisely</p>
+    <!-- Mystic Footer -->
+    <footer
+        class="footer-glow fixed bottom-0 left-0 w-full z-40 border-t border-green-900/50 bg-black/90 backdrop-blur-md">
+        <!-- Scrolling Data Stream -->
+        <div class="w-full overflow-hidden border-b border-green-900/30 bg-green-900/5 h-6 flex items-center">
+            <div class="whitespace-nowrap animate-marquee text-[9px] font-mono text-green-600/60 s">
+                INITIALIZING_PROTOCOL... SKIPPING_HASH... 0x4F32... SYSTEM_INTEGRITY: 99%... UPLOADING_CONSCIOUSNESS...
+                MATRIX_KEY_ACCEPTED... FIND_THE_WHITE_RABBIT... DECENTRALIZED_FUTURE_AWAITING...
+            </div>
+        </div>
+
+        <div class="flex justify-between items-center p-2 px-4 h-8 md:h-10">
+            <!-- Left: Status -->
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-1.5">
+                    <div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                    <span class="text-[9px] text-green-800 uppercase tracking-wider">Server: <span
+                            class="text-green-400">ONLINE</span></span>
+                </div>
+                <div class="hidden sm:flex items-center space-x-1.5">
+                    <i class="fas fa-shield-alt text-[9px] text-green-700"></i>
+                    <span class="text-[9px] text-green-800 uppercase tracking-wider">Encryption: <span
+                            class="text-green-400">AES-256</span></span>
+                </div>
+            </div>
+
+            <!-- Center: Mystic Text -->
+            <div class="absolute left-1/2 transform -translate-x-1/2 hidden md:block">
+                <span
+                    class="text-[10px] text-green-500/70 font-mono tracking-[0.2em] glitch-text hover:text-green-400 transition-colors cursor-help"
+                    data-text="REALITY_IS_A_CHOICE">REALITY_IS_A_CHOICE</span>
+            </div>
+
+            <!-- Right: Version -->
+            <div class="flex items-center space-x-4">
+                <span class="text-[9px] text-green-800 font-mono">v3.1.0</span>
+            </div>
+        </div>
     </footer>
 
     <!-- Matrix Canvas -->
