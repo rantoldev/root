@@ -4,4 +4,3 @@ pages_build_output_dir = "./public"
 
 [assets]
 directory = "./public"
-binding = "ASSETS"
