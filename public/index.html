@@ -145,8 +145,6 @@
             5% {
                 clip: rect(72px, 9999px, 8px, 0);
             }
-
-            /* ... truncated keyframes ... */
         }
 
         /* Custom Scrollbar */
@@ -497,30 +495,44 @@
     <div class="crt-vignette"></div>
 
     <!-- Premium Header -->
-    <header class="header-glass fixed top-0 left-0 w-full z-[5000] p-4 flex justify-between items-center">
-        <div class="flex items-center space-x-4">
-            <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center neon-border">
-                <i class="fas fa-microchip text-black"></i>
+    <header
+        class="header-glass fixed top-0 left-0 w-full z-[5000] p-2 md:p-4 flex flex-col md:flex-row justify-between items-center space-y-3 md:space-y-0">
+        <div class="flex items-center space-x-4 w-full md:w-auto justify-between md:justify-start">
+            <div class="flex items-center space-x-3">
+                <div
+                    class="w-8 h-8 md:w-10 md:h-10 bg-green-500 rounded-full flex items-center justify-center neon-border">
+                    <i class="fas fa-microchip text-black text-sm md:text-base"></i>
+                </div>
+                <div>
+                    <h1 class="text-green-400 font-bold text-base md:text-lg tracking-widest glitch-text"
+                        data-text="TERM">
+                        TERM</h1>
+                    <div class="text-[8px] md:text-[10px] text-green-700 font-mono uppercase tracking-tighter">Secure
+                        Comms Protocol v3.1
+                    </div>
+                </div>
             </div>
-            <div>
-                <h1 class="text-green-400 font-bold text-lg tracking-widest glitch-text" data-text="TERM">
-                    TERM</h1>
-                <div class="text-[10px] text-green-700 font-mono uppercase tracking-tighter">Secure Comms Protocol v3.1
+            <!-- Mobile-only status/countdown container -->
+            <div class="flex md:hidden items-center space-x-3 overflow-hidden">
+                <div class="flex flex-col items-end">
+                    <span id="countdownTimer" class="text-green-400 text-[10px] font-mono animate-pulse">00:00:00</span>
+                    <span class="text-green-400 text-[8px] animate-pulse">MATRIX: LOADED</span>
                 </div>
             </div>
         </div>
 
-        <div class="flex-1 max-w-xl px-12">
-            <div class="ca-box p-2 rounded flex items-center justify-between group cursor-pointer" onclick="copyCA()">
-                <div class="flex items-center space-x-2">
-                    <span class="text-green-800 text-[10px] font-bold">CONTRACT:</span>
-                    <span id="tokenCA" class="text-green-400 text-xs font-mono">CAPASTE</span>
+        <div class="w-full md:flex-1 md:max-w-xl md:px-12">
+            <div class="ca-box p-1.5 md:p-2 rounded flex items-center justify-between group cursor-pointer"
+                onclick="copyCA()">
+                <div class="flex items-center space-x-2 overflow-hidden">
+                    <span class="text-green-800 text-[9px] md:text-[10px] font-bold">CONTRACT:</span>
+                    <span id="tokenCA" class="text-green-400 text-[10px] md:text-xs font-mono truncate">CAPASTE</span>
                 </div>
-                <i class="fas fa-copy text-green-800 group-hover:text-green-400 transition-colors"></i>
+                <i class="fas fa-copy text-green-800 group-hover:text-green-400 transition-colors text-xs"></i>
             </div>
         </div>
 
-        <div class="flex items-center space-x-6">
+        <div class="hidden md:flex items-center space-x-6">
             <div id="launchCountdown" class="flex items-center space-x-2">
                 <span id="countdownTimer" class="text-green-400 text-xs font-mono animate-pulse">00:00:00</span>
             </div>
@@ -532,22 +544,29 @@
     </header>
 
     <!-- Main Content -->
-    <main id="terminalScreen" class="pt-24 pb-4 px-4 h-screen flex flex-col relative z-10">
+    <main id="terminalScreen" class="pt-32 md:pt-24 pb-4 px-2 md:px-4 h-screen flex flex-col relative z-10">
         <div class="flex-1 flex items-center justify-center">
-            <div class="glass-panel p-8 rounded-xl max-w-4xl w-full flex flex-col h-full max-h-[80vh]">
-                <div class="flex justify-between items-center border-b border-green-900/30 pb-4 mb-6">
-                    <span class="text-green-400 text-lg font-bold tracking-widest glitch-text"
+            <div
+                class="glass-panel p-4 md:p-8 rounded-xl max-w-4xl w-full flex flex-col h-full max-h-[85vh] md:max-h-[80vh]">
+                <div
+                    class="flex flex-col md:flex-row justify-between items-center border-b border-green-900/30 pb-2 md:pb-4 mb-4 md:mb-6 space-y-3 md:space-y-0">
+                    <span class="text-green-400 text-base md:text-lg font-bold tracking-widest glitch-text"
                         data-text="MATRIX_TERMINAL">
                         MATRIX_TERMINAL</span>
-                    <div class="flex items-center space-x-3">
-                        <button id="clearMindBtn" class="clear-btn font-mono uppercase tracking-tighter">
-                            [ CLEAR_YOUR_MIND ]
-                        </button>
-                        <button id="resetSystemBtn" class="clear-btn font-mono uppercase tracking-tighter">
-                            [ RESET_SYSTEM ]
-                        </button>
-                        <div class="flex items-center space-x-2">
-                            <span class="text-green-400 text-xs animate-pulse">LAUNCH_SEQUENCE_ACTIVE</span>
+                    <div class="flex flex-col sm:flex-row items-center justify-between w-full md:w-auto gap-3">
+                        <div class="flex space-x-2 w-full sm:w-auto">
+                            <button id="clearMindBtn"
+                                class="clear-btn flex-1 sm:flex-none font-mono uppercase tracking-tighter text-[9px] md:text-[10px] py-1 md:py-1">
+                                [ CLEAR ]
+                            </button>
+                            <button id="resetSystemBtn"
+                                class="clear-btn flex-1 sm:flex-none font-mono uppercase tracking-tighter text-[9px] md:text-[10px] py-1 md:py-1">
+                                [ RESET ]
+                            </button>
+                        </div>
+                        <div class="flex items-center space-x-2 justify-center sm:justify-end">
+                            <span
+                                class="text-green-400 text-[9px] md:text-xs animate-pulse whitespace-nowrap">LAUNCH_SEQUENCE_ACTIVE</span>
                             <div class="w-2 h-2 rounded-full bg-green-500 animate-ping"></div>
                         </div>
                     </div>
@@ -559,42 +578,42 @@
                 </div>
 
                 <div id="terminal-input"
-                    class="flex flex-wrap items-center justify-center gap-2 mt-6 pt-4 border-t border-green-900/30">
+                    class="grid grid-cols-2 sm:flex sm:flex-wrap items-center justify-center gap-2 mt-4 md:mt-6 pt-4 border-t border-green-900/30">
                     <button id="redPillBtn"
-                        class="btn-red-pill bg-transparent hover:bg-white/10 text-white/70 hover:text-red-500 px-3 py-1.5 rounded border border-white/20 font-mono text-xs tracking-tight transition-all">
+                        class="btn-red-pill bg-transparent hover:bg-white/10 text-white/70 hover:text-red-500 px-2 md:px-3 py-1.5 rounded border border-white/20 font-mono text-[10px] md:text-xs tracking-tight transition-all truncate">
                         ./take_red_pill
                     </button>
                     <button id="bluePillBtn"
-                        class="btn-blue-pill bg-transparent hover:bg-white/10 text-white/70 hover:text-blue-500 px-3 py-1.5 rounded border border-white/20 font-mono text-xs tracking-tight transition-all">
+                        class="btn-blue-pill bg-transparent hover:bg-white/10 text-white/70 hover:text-blue-500 px-2 md:px-3 py-1.5 rounded border border-white/20 font-mono text-[10px] md:text-xs tracking-tight transition-all truncate">
                         ./take_blue_pill
                     </button>
                     <button id="hackBtn"
-                        class="btn-hack bg-transparent hover:bg-white/10 text-white/70 px-3 py-1.5 rounded border border-white/20 font-mono text-xs tracking-tight transition-all">
+                        class="btn-hack bg-transparent hover:bg-white/10 text-white/70 px-2 md:px-3 py-1.5 rounded border border-white/20 font-mono text-[10px] md:text-xs tracking-tight transition-all truncate">
                         ./hack_contract
                     </button>
                     <button id="oracleBtn"
-                        class="btn-oracle bg-transparent hover:bg-white/10 text-white/70 px-3 py-1.5 rounded border border-white/20 font-mono text-xs tracking-tight transition-all">
+                        class="btn-oracle bg-transparent hover:bg-white/10 text-white/70 px-2 md:px-3 py-1.5 rounded border border-white/20 font-mono text-[10px] md:text-xs tracking-tight transition-all truncate">
                         ./consult_oracle
                     </button>
                     <!-- New Buttons -->
                     <button id="scanMatrixBtn"
-                        class="btn-scan bg-transparent hover:bg-white/10 text-white/70 px-3 py-1.5 rounded border border-white/20 font-mono text-xs tracking-tight transition-all">
+                        class="btn-scan bg-transparent hover:bg-white/10 text-white/70 px-2 md:px-3 py-1.5 rounded border border-white/20 font-mono text-[10px] md:text-xs tracking-tight transition-all truncate">
                         ./scan_matrix
                     </button>
                     <button id="overrideSentinelBtn"
-                        class="btn-override bg-transparent hover:bg-white/10 text-white/70 px-3 py-1.5 rounded border border-white/20 font-mono text-xs tracking-tight transition-all">
+                        class="btn-override bg-transparent hover:bg-white/10 text-white/70 px-2 md:px-3 py-1.5 rounded border border-white/20 font-mono text-[10px] md:text-xs tracking-tight transition-all truncate">
                         ./override_sentinel
                     </button>
                     <button id="whiteRabbitBtn"
-                        class="btn-rabbit bg-transparent hover:bg-white/10 text-white/70 px-3 py-1.5 rounded border border-white/20 font-mono text-xs tracking-tight transition-all">
+                        class="btn-rabbit bg-transparent hover:bg-white/10 text-white/70 px-2 md:px-3 py-1.5 rounded border border-white/20 font-mono text-[10px] md:text-xs tracking-tight transition-all truncate">
                         ./follow_white_rabbit
                     </button>
                     <button id="dejaVuBtn"
-                        class="btn-deja-vu bg-transparent hover:bg-white/10 text-white/70 px-3 py-1.5 rounded border border-white/20 font-mono text-xs tracking-tight transition-all">
+                        class="btn-deja-vu bg-transparent hover:bg-white/10 text-white/70 px-2 md:px-3 py-1.5 rounded border border-white/20 font-mono text-[10px] md:text-xs tracking-tight transition-all truncate">
                         ./trigger_deja_vu
                     </button>
                     <button id="manifestDestinyBtn"
-                        class="btn-destiny bg-transparent hover:bg-white/10 text-white/70 px-3 py-1.5 rounded border border-white/20 font-mono text-xs tracking-tight transition-all">
+                        class="btn-destiny bg-transparent hover:bg-white/10 text-white/70 px-2 md:px-3 py-1.5 rounded border border-white/20 font-mono text-[10px] md:text-xs tracking-tight transition-all truncate col-span-2 sm:col-auto">
                         ./manifest_destiny
                     </button>
                 </div>
