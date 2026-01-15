@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:,">
+    <title>TERM - Privacy-Focused Anon Chat</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Terminal Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Socket.IO for Pump.fun Chat (if needed, otherwise remove) -->
+    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
+    <!-- NATS for Pump.fun v2 Realtime Chat (if needed) -->
+    <script type="module">
+        import { connect } from "https://unpkg.com/nats.ws@1.30.2/esm/nats.js";
+        window.nats = { connect };
+        console.log("[NATS] Library loaded and attached to window.nats");
+    </script>
+    <!-- Solana Web3.js for Helius Integration (if needed) -->
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+    <style>
+        :root {
+            --term-green: #00ff41;
+            --term-purple: #9d00ff;
+            --term-cyan: #00f3ff;
+            --term-bg: #030805;
+            --glass-bg: rgba(6, 18, 12, 0.4);
+            --glass-border: rgba(0, 255, 65, 0.2);
+        }
+
+        body {
+            font-family: 'Source Code Pro', monospace;
+            background-color: var(--term-bg);
+            color: #eee;
+            overflow: hidden;
+        }
+
+        /* Glassmorphism Classes */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .glass-panel:hover {
+            border-color: rgba(0, 255, 65, 0.4);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        /* CRT Overlay Effect */
+        .crt-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.3;
+        }
+
+        .terminal-text {
+            color: var(--term-green);
+            text-shadow: 0 0 8px rgba(0, 255, 65, 0.5);
+        }
+
+        .neon-border {
+            border: 1px solid var(--term-green);
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.2), inset 0 0 5px rgba(0, 255, 65, 0.1);
+        }
+
+        .message-animation {
+            animation: slideIn 0.2s ease-out forwards;
+            opacity: 0;
+            border-left: 2px solid transparent;
+            padding-left: 8px;
+            margin-bottom: 4px;
+        }
+
+        .message-animation:hover {
+            border-left-color: var(--term-green);
+            background: rgba(0, 255, 65, 0.05);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .cursor-blink {
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+
+        /* Glitch Effect */
+        .glitch-text {
+            position: relative;
+            display: inline-block;
+        }
+
+        .glitch-text::before,
+        .glitch-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .glitch-text::before {
+            left: 2px;
+            text-shadow: -1px 0 #ff00c1;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim 5s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0% {
+                clip: rect(32px, 9999px, 88px, 0);
+            }
+
+            5% {
+                clip: rect(72px, 9999px, 8px, 0);
+            }
+
+            /* ... truncated keyframes ... */
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--term-green);
+            border-radius: 10px;
+            opacity: 0.3;
+        }
+
+        .header-glass {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 255, 65, 0.3);
+        }
+
+        .ca-box {
+            background: rgba(0, 255, 65, 0.1);
+            border: 1px dashed var(--term-green);
+        }
+
+        .terminal-cursor {
+            display: inline-block;
+            width: 8px;
+            height: 16px;
+            background-color: var(--term-green);
+            animation: blink 1s infinite;
+        }
+
+        .typing-line {
+            border-left: 2px solid var(--term-green);
+            padding-left: 8px;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .narrative-text {
+            margin-bottom: 8px;
+        }
+
+        .narrative-text:last-child {
+            border-left: 2px solid var(--term-green);
+            padding-left: 8px;
+        }
+
+        .command-output-block {
+            margin: 20px 0;
+            padding: 10px 0;
+            border-top: 1px dashed rgba(0, 255, 65, 0.1);
+            border-bottom: 1px dashed rgba(0, 255, 65, 0.1);
+            background: rgba(0, 255, 65, 0.02);
+        }
+
+        .clear-btn {
+            font-size: 10px;
+            color: var(--term-green);
+            opacity: 0.5;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid rgba(0, 255, 65, 0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        /* All-Seeing Eye Styling */
+        .eye-container {
+            width: 50px;
+            height: 30px;
+            background: #000;
+            border-radius: 100%;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid rgba(0, 255, 65, 0.3);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.1), inset 0 0 10px rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .eye-container:hover {
+            border-color: rgba(0, 255, 65, 0.8);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
+        }
+
+        .sclera {
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, #222 0%, #000 100%);
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .iris {
+            width: 18px;
+            height: 18px;
+            background: radial-gradient(circle, #00ff41 0%, #003b00 70%, #000 100%);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+            transition: all 0.1s ease-out;
+        }
+
+        .pupil {
+            width: 8px;
+            height: 8px;
+            background: #000;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: inset 0 0 5px rgba(0, 255, 65, 0.5);
+        }
+
+        .eye-reflection {
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            position: absolute;
+            top: 30%;
+            left: 30%;
+        }
+
+        /* Advanced Hover Animations */
+        @keyframes pulse-red {
+            0% {
+                box-shadow: 0 0 5px rgba(239, 68, 68, 0.2);
+            }
+
+            50% {
+                box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+            }
+
+            100% {
+                box-shadow: 0 0 5px rgba(239, 68, 68, 0.2);
+            }
+        }
+
+        @keyframes pulse-blue {
+            0% {
+                box-shadow: 0 0 5px rgba(59, 130, 246, 0.2);
+            }
+
+            50% {
+                box-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
+            }
+
+            100% {
+                box-shadow: 0 0 5px rgba(59, 130, 246, 0.2);
+            }
+        }
+
+        @keyframes jitter {
+            0% {
+                transform: translate(0);
+            }
+
+            25% {
+                transform: translate(1px, -1px);
+            }
+
+            50% {
+                transform: translate(-1px, 1px);
+            }
+
+            75% {
+                transform: translate(1px, 1px);
+            }
+
+            100% {
+                transform: translate(0);
+            }
+        }
+
+        @keyframes scanline-btn {
+            0% {
+                background-position: 0 -100%;
+            }
+
+            100% {
+                background-position: 0 100%;
+            }
+        }
+
+        @keyframes strobe {
+            0% {
+                opacity: 1;
+                border-color: white;
+            }
+
+            50% {
+                opacity: 0.5;
+                border-color: red;
+            }
+
+            100% {
+                opacity: 1;
+                border-color: white;
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+
+            100% {
+                background-position: 200% 0;
+            }
+        }
+
+        @keyframes ghost {
+            0% {
+                text-shadow: 0 0 0 white;
+            }
+
+            50% {
+                text-shadow: 5px 0 10px rgba(255, 255, 255, 0.5), -5px 0 10px rgba(255, 255, 255, 0.5);
+            }
+
+            100% {
+                text-shadow: 0 0 0 white;
+            }
+        }
+
+        .btn-red-pill:hover {
+            animation: pulse-red 1.5s infinite;
+            transform: scale(1.05);
+        }
+
+        .btn-blue-pill:hover {
+            animation: pulse-blue 1.5s infinite;
+            transform: scale(1.05);
+        }
+
+        .btn-hack:hover {
+            animation: jitter 0.1s infinite;
+            text-shadow: 2px 0 red, -2px 0 blue;
+        }
+
+        .btn-oracle:hover {
+            box-shadow: 0 0 25px rgba(34, 211, 238, 0.4);
+            text-shadow: 0 0 8px rgba(34, 211, 238, 0.8);
+        }
+
+        .btn-scan:hover {
+            background: linear-gradient(transparent 50%, rgba(34, 211, 238, 0.1) 50%);
+            background-size: 100% 4px;
+            animation: scanline-btn 0.5s linear infinite;
+        }
+
+        .btn-override:hover {
+            animation: strobe 0.2s infinite;
+            color: #ff0000 !important;
+        }
+
+        .btn-rabbit:hover {
+            animation: ghost 1s infinite;
+            letter-spacing: 2px;
+        }
+
+        .btn-deja-vu:hover {
+            position: relative;
+        }
+
+        .btn-deja-vu:hover::before {
+            content: './trigger_deja_vu';
+            position: absolute;
+            left: 2px;
+            top: 1px;
+            opacity: 0.5;
+            color: yellow;
+            pointer-events: none;
+        }
+
+        .btn-destiny:hover {
+            background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.2), transparent);
+            background-size: 200% 100%;
+            animation: shimmer 1s infinite;
+            color: #d4af37 !important;
+        }
+
+        .clear-btn:hover {
+            opacity: 1;
+            background: rgba(0, 255, 65, 0.1);
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.2);
+        }
+
+        /* Glitch Animation for Deja Vu */
+        .glitch-active {
+            animation: glitch-skew 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
+        }
+
+        @keyframes glitch-skew {
+            0% {
+                transform: skew(0deg);
+            }
+
+            20% {
+                transform: skew(2deg);
+            }
+
+            40% {
+                transform: skew(-2deg);
+            }
+
+            60% {
+                transform: skew(1deg);
+            }
+
+            80% {
+                transform: skew(-1deg);
+            }
+
+            100% {
+                transform: skew(0deg);
+            }
+        }
+    </style>
+</head>
+
+<body class="relative">
+    <!-- CRT Effects -->
+    <div class="crt-overlay"></div>
+    <div class="crt-vignette"></div>
+
+    <!-- Premium Header -->
+    <header class="header-glass fixed top-0 left-0 w-full z-[5000] p-4 flex justify-between items-center">
+        <div class="flex items-center space-x-4">
+            <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center neon-border">
+                <i class="fas fa-microchip text-black"></i>
+            </div>
+            <div>
+                <h1 class="text-green-400 font-bold text-lg tracking-widest glitch-text" data-text="TERM">
+                    TERM</h1>
+                <div class="text-[10px] text-green-700 font-mono uppercase tracking-tighter">Secure Comms Protocol v3.1
+                </div>
+            </div>
+        </div>
+
+        <div class="flex-1 max-w-xl px-12">
+            <div class="ca-box p-2 rounded flex items-center justify-between group cursor-pointer" onclick="copyCA()">
+                <div class="flex items-center space-x-2">
+                    <span class="text-green-800 text-[10px] font-bold">CONTRACT:</span>
+                    <span id="tokenCA" class="text-green-400 text-xs font-mono">CAPASTE</span>
+                </div>
+                <i class="fas fa-copy text-green-800 group-hover:text-green-400 transition-colors"></i>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-6">
+            <div id="launchCountdown" class="flex items-center space-x-2">
+                <span id="countdownTimer" class="text-green-400 text-xs font-mono animate-pulse">00:00:00</span>
+            </div>
+            <div id="connectionStatus" class="flex items-center space-x-2">
+                <span class="text-[10px] text-green-800">MATRIX:</span>
+                <span class="text-green-400 text-xs animate-pulse">LOADED</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="terminalScreen" class="pt-24 pb-4 px-4 h-screen flex flex-col relative z-10">
+        <div class="flex-1 flex items-center justify-center">
+            <div class="glass-panel p-8 rounded-xl max-w-4xl w-full flex flex-col h-full max-h-[80vh]">
+                <div class="flex justify-between items-center border-b border-green-900/30 pb-4 mb-6">
+                    <span class="text-green-400 text-lg font-bold tracking-widest glitch-text"
+                        data-text="MATRIX_TERMINAL">
+                        MATRIX_TERMINAL</span>
+                    <div class="flex items-center space-x-3">
+                        <button id="clearMindBtn" class="clear-btn font-mono uppercase tracking-tighter">
+                            [ CLEAR_YOUR_MIND ]
+                        </button>
+                        <button id="resetSystemBtn" class="clear-btn font-mono uppercase tracking-tighter">
+                            [ RESET_SYSTEM ]
+                        </button>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-green-400 text-xs animate-pulse">LAUNCH_SEQUENCE_ACTIVE</span>
+                            <div class="w-2 h-2 rounded-full bg-green-500 animate-ping"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="terminal-output"
+                    class="flex-1 overflow-y-auto font-mono text-green-400 text-sm space-y-2 custom-scrollbar">
+                    <!-- Narrative text will be typed here -->
+                </div>
+
+                <div id="terminal-input"
+                    class="flex flex-wrap items-center justify-center gap-2 mt-6 pt-4 border-t border-green-900/30">
+                    <button id="redPillBtn"
+                        class="btn-red-pill bg-transparent hover:bg-white/10 text-white/70 hover:text-red-500 px-3 py-1.5 rounded border border-white/20 font-mono text-xs tracking-tight transition-all">
+                        ./take_red_pill
+                    </button>
+                    <button id="bluePillBtn"
+                        class="btn-blue-pill bg-transparent hover:bg-white/10 text-white/70 hover:text-blue-500 px-3 py-1.5 rounded border border-white/20 font-mono text-xs tracking-tight transition-all">
+                        ./take_blue_pill
+                    </button>
+                    <button id="hackBtn"
+                        class="btn-hack bg-transparent hover:bg-white/10 text-white/70 px-3 py-1.5 rounded border border-white/20 font-mono text-xs tracking-tight transition-all">
+                        ./hack_contract
+                    </button>
+                    <button id="oracleBtn"
+                        class="btn-oracle bg-transparent hover:bg-white/10 text-white/70 px-3 py-1.5 rounded border border-white/20 font-mono text-xs tracking-tight transition-all">
+                        ./consult_oracle
+                    </button>
+                    <!-- New Buttons -->
+                    <button id="scanMatrixBtn"
+                        class="btn-scan bg-transparent hover:bg-white/10 text-white/70 px-3 py-1.5 rounded border border-white/20 font-mono text-xs tracking-tight transition-all">
+                        ./scan_matrix
+                    </button>
+                    <button id="overrideSentinelBtn"
+                        class="btn-override bg-transparent hover:bg-white/10 text-white/70 px-3 py-1.5 rounded border border-white/20 font-mono text-xs tracking-tight transition-all">
+                        ./override_sentinel
+                    </button>
+                    <button id="whiteRabbitBtn"
+                        class="btn-rabbit bg-transparent hover:bg-white/10 text-white/70 px-3 py-1.5 rounded border border-white/20 font-mono text-xs tracking-tight transition-all">
+                        ./follow_white_rabbit
+                    </button>
+                    <button id="dejaVuBtn"
+                        class="btn-deja-vu bg-transparent hover:bg-white/10 text-white/70 px-3 py-1.5 rounded border border-white/20 font-mono text-xs tracking-tight transition-all">
+                        ./trigger_deja_vu
+                    </button>
+                    <button id="manifestDestinyBtn"
+                        class="btn-destiny bg-transparent hover:bg-white/10 text-white/70 px-3 py-1.5 rounded border border-white/20 font-mono text-xs tracking-tight transition-all">
+                        ./manifest_destiny
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-8 p-4 border-t border-gray-800 text-center text-gray-500 text-sm">
+        <p class="glitch-text" data-text="Welcome to the Matrix • $TERM Token Launch • Choose Your Pill Wisely">Welcome
+            to the Matrix • $TERM Token Launch • Choose Your Pill Wisely</p>
+    </footer>
+
+    <!-- Matrix Canvas -->
+    <canvas id="matrixCanvas" class="fixed top-0 left-0 w-full h-full -z-10"></canvas>
+
+    <script src="matrix.js"></script>
+    <script src="app.js?v=PrivacyUpdate_2.0"></script>
+</body>
+
+</html>
