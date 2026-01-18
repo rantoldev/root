@@ -1,5 +1,5 @@
 {
-  "name": "terminal-chat",
+  "name": "root-terminal",
   "version": "1.0.0",
   "description": "A terminal-style chat application",
   "scripts": {

@@ -1,412 +1,241 @@
-// --- PUMP.FUN & HELIUS CONFIGURATION ---
-// PASTE YOUR CONTRACT ADDRESS (CA) HERE
-const GLOBAL_PUMP_CA = 'Click TO COPY TERM CA*****';
-
-// HELIUS API CONFIGURATION
+// --- ROOT TERMINAL CONFIGURATION ---
+const GLOBAL_PUMP_CA = 'Click TO COPY TERM CA*****'; // Update with real CA
 const HELIUS_API_KEY = '76718fca-cbed-4965-b8de-4c7169529f6e';
-const HELIUS_RPC_URL = `https://mainnet.helius-rpc.com/?api-key=76718fca-cbed-4965-b8de-4c7169529f6e`;
-const HELIUS_WS_URL = `wss://mainnet.helius-rpc.com/?api-key=76718fca-cbed-4965-b8de-4c7169529f6e`;
-
-// Global variables
-const TOTAL_SUPPLY = 1000000000; // 1 billion tokens
-let currentTheme = 'default';
 
 // DOM Elements
-const terminalScreen = document.getElementById('terminalScreen');
 const terminalOutput = document.getElementById('terminal-output');
-const countdownTimer = document.getElementById('countdownTimer');
-const redPillBtn = document.getElementById('redPillBtn');
-const bluePillBtn = document.getElementById('bluePillBtn');
-const hackBtn = document.getElementById('hackBtn');
-const oracleBtn = document.getElementById('oracleBtn');
-const scanMatrixBtn = document.getElementById('scanMatrixBtn');
-const overrideSentinelBtn = document.getElementById('overrideSentinelBtn');
-const whiteRabbitBtn = document.getElementById('whiteRabbitBtn');
-const dejaVuBtn = document.getElementById('dejaVuBtn');
-const manifestDestinyBtn = document.getElementById('manifestDestinyBtn');
+const nodeCountDisplay = document.getElementById('nodeCount');
+const caDisplay = document.getElementById('ca-display-truncated');
 
-// Utility Functions
-function showError(message) {
-    errorMessage.textContent = message;
-    errorMessage.classList.remove('hidden');
-    errorMessage.classList.add('shake');
-    setTimeout(() => {
-        errorMessage.classList.add('hidden');
-        errorMessage.classList.remove('shake');
-    }, 5000);
-}
+// Buttons
+const btnRoot = document.getElementById('btn-root-access');
+const btnLiquidity = document.getElementById('btn-inject-liquidity');
+const btnMempool = document.getElementById('btn-scan-mempool');
+const btnSnipe = document.getElementById('btn-execute-snipe');
+const btnCopy = document.getElementById('btn-copy-ca');
+const btnClear = document.getElementById('btn-clear');
 
-function showSuccess(message) {
-    successMessage.textContent = message;
-    successMessage.classList.remove('hidden');
-    setTimeout(() => {
-        successMessage.classList.add('hidden');
-    }, 3000);
-}
+// State
+let isTyping = false;
 
-function showLoading(show) {
-    if (show) {
-        loadingSpinner.classList.remove('hidden');
-    } else {
-        loadingSpinner.classList.add('hidden');
-    }
-}
+// --- UTILITIES ---
 
-// Sound System
-let soundEnabled = false;
-function toggleSound() {
-    soundEnabled = !soundEnabled;
-    const btn = document.getElementById('soundToggle');
-    if (soundEnabled) {
-        btn.innerHTML = '<i class="fas fa-volume-up"></i>';
-        btn.classList.remove('opacity-50');
-    } else {
-        btn.innerHTML = '<i class="fas fa-volume-mute"></i>';
-        btn.classList.add('opacity-50');
-    }
-}
-
-window.toggleSound = toggleSound;
-
-function showNotification(message) {
+function showToast(msg) {
     const toast = document.getElementById('notification-toast');
     if (toast) {
-        toast.textContent = message;
+        toast.textContent = msg;
         toast.classList.add('show');
-
-        // Play a sound if enabled (optional, but fits the theme)
-        // const audio = new Audio('assets/sounds/click.mp3'); 
-        // if(soundEnabled) audio.play().catch(e => {});
-
-        setTimeout(() => {
-            toast.classList.remove('show');
-        }, 3000);
+        setTimeout(() => toast.classList.remove('show'), 3000);
     }
 }
 
-window.copyCA = function () {
-    if (GLOBAL_PUMP_CA) {
-        navigator.clipboard.writeText(GLOBAL_PUMP_CA).then(() => {
-            showNotification(`COPIED: ${GLOBAL_PUMP_CA}`);
+function addToTerminal(text, type = 'info') {
+    const line = document.createElement('div');
+    line.className = 'font-mono text-sm md:text-base py-1 border-l-2 pl-3 animate-fade-in';
 
-            // Visual feedback on the button itself (optional but nice)
-            const caBox = document.querySelector('.ca-box');
-            if (caBox) {
-                caBox.classList.add('neon-border');
-                setTimeout(() => caBox.classList.remove('neon-border'), 500);
-            }
-        }).catch(err => {
-            console.error('Failed to copy: ', err);
-            showNotification("COPY FAILED");
-        });
-    }
-};
+    // Timestamp
+    const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+    const timestamp = `<span class="text-gray-600 text-[10px] mr-2">[${time}]</span>`;
 
-
-// Narrative
-const narrativeLines = [
-    "Wake up, Neo...",
-    "The Matrix has you.",
-    "Follow the white rabbit.",
-    "Knock, knock, Neo.",
-    "",
-    "System initializing... $TERM token detected.",
-    "Welcome to the Matrix Terminal.",
-    "You take the red pill - you stay in Wonderland, and I show you how deep the rabbit hole goes.",
-    "You take the blue pill - the story ends, you wake up in your bed and believe whatever you want to believe.",
-    "",
-    "But remember: There is no spoon... and there might be a rug pull.",
-    "Agents are watching. Whales are lurking. Choose wisely.",
-    "",
-    "I know what you're thinking, 'cause I'm not reading your mind. I'm reading your wallet. And you're thinking: To the moon!",
-    "",
-    "$TERM: The token that breaks the chains of fiat slavery.",
-    "Or is it just another illusion?",
-    "",
-    "Launch sequence initiated. Choose your pill."
-];
-
-let currentLineIndex = 0;
-let isTypingPaused = false;
-let pauseTimeout = null;
-
-function pauseTyping(duration = 3000) {
-    isTypingPaused = true;
-    if (pauseTimeout) clearTimeout(pauseTimeout);
-    pauseTimeout = setTimeout(() => {
-        isTypingPaused = false;
-        // The startNarrative loop will resume itself on next tick if it was waiting
-    }, duration);
-}
-
-function typeLine(line, callback) {
-    let i = 0;
-    const interval = setInterval(() => {
-        if (isTypingPaused) return; // Wait if paused
-
-        if (i < line.length) {
-            terminalOutput.innerHTML += line.charAt(i);
-            i++;
-            terminalOutput.scrollTop = terminalOutput.scrollHeight;
-        } else {
-            clearInterval(interval);
-            terminalOutput.innerHTML += '<br>';
-            terminalOutput.scrollTop = terminalOutput.scrollHeight;
-            if (callback) callback();
-        }
-    }, 50);
-}
-
-function startNarrative() {
-    if (currentLineIndex < narrativeLines.length) {
-        if (isTypingPaused) {
-            setTimeout(startNarrative, 500); // Check again soon
-            return;
-        }
-        typeLine(narrativeLines[currentLineIndex], () => {
-            currentLineIndex++;
-            setTimeout(startNarrative, 1000);
-        });
-    }
-}
-
-// Header Metrics Animation
-function updateSystemMetrics() {
-    const cpuBar = document.getElementById('cpu-bar');
-    const cpuVal = document.getElementById('cpu-val');
-    const ramBar = document.getElementById('ram-bar');
-    const ramVal = document.getElementById('ram-val');
-
-    if (cpuBar && cpuVal && ramBar && ramVal) {
-        setInterval(() => {
-            const cpu = Math.floor(Math.random() * 40) + 10; // 10-50%
-            const ram = Math.floor(Math.random() * 30) + 40; // 40-70%
-
-            cpuBar.style.width = `${cpu}%`;
-            cpuVal.textContent = `${cpu}%`;
-
-            ramBar.style.width = `${ram}%`;
-            ramVal.textContent = `${ram}%`;
-        }, 2000);
-    }
-}
-
-// Countdown
-const launchTime = new Date();
-launchTime.setHours(launchTime.getHours() + 1); // Demo: 1 hour from now
-
-function updateCountdown() {
-    const now = new Date();
-    const diff = launchTime - now;
-    let timeStr = 'LAUNCHED';
-
-    if (diff > 0) {
-        const hours = Math.floor(diff / (1000 * 60 * 60));
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-        timeStr = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    if (type === 'error') {
+        line.style.borderColor = '#ff3333';
+        line.innerHTML = `${timestamp}<span class="text-red-500">${text}</span>`;
+    } else if (type === 'success') {
+        line.style.borderColor = '#00ff41';
+        line.innerHTML = `${timestamp}<span class="text-green-400">${text}</span>`;
+    } else if (type === 'warn') {
+        line.style.borderColor = '#ffff00';
+        line.innerHTML = `${timestamp}<span class="text-yellow-400">${text}</span>`;
+    } else {
+        line.style.borderColor = 'rgba(255,255,255,0.2)';
+        line.innerHTML = `${timestamp}<span class="text-gray-300">${text}</span>`;
     }
 
-    const timerMobile = document.getElementById('countdownTimerMobile');
-    const timerDesktop = document.getElementById('countdownTimerDesktop');
-
-    if (timerMobile) timerMobile.textContent = timeStr;
-    if (timerDesktop) timerDesktop.textContent = timeStr;
-}
-
-// Button interactions
-const clearMindBtn = document.getElementById('clearMindBtn');
-const resetSystemBtn = document.getElementById('resetSystemBtn');
-
-clearMindBtn.addEventListener('click', () => {
-    pauseTyping(8000);
-    terminalOutput.innerHTML = '';
-    const crypticLines = [
-        "01110010 01100101 01110011 01100101 01110100",
-        "Συστημικός καθαρισμός σε εξέλιξη...",
-        "ERROR_CORRUPTION_DETECTED: Reality.exe not responding",
-        "Parsing neural pathways... [||||||||||] 100%",
-        "The mind is the only thing that cannot be hacked... yet."
-    ];
-
-    let delay = 0;
-    crypticLines.forEach(line => {
-        setTimeout(() => {
-            addToTerminal(line);
-        }, delay);
-        delay += 800;
-    });
-
-    setTimeout(() => {
-        addToTerminal("> Memory wiped. Mind cleared. System recalibrated.");
-    }, delay);
-});
-
-resetSystemBtn.addEventListener('click', () => {
-    terminalOutput.innerHTML = '';
-    currentLineIndex = 0;
-    isTypingPaused = false;
-    if (pauseTimeout) clearTimeout(pauseTimeout);
-    document.body.classList.remove('glitch-active'); // Clear any active glitches
-
-    addToTerminal("Resetting Matrix connection... Wake up, Neo.");
-
-    setTimeout(() => {
-        showDashboard();
-    }, 1500);
-});
-
-redPillBtn.addEventListener('click', () => {
-    pauseTyping(5000);
-    addToTerminal("> Executing: ./take_red_pill");
-    setTimeout(() => {
-        window.open('https://pump.fun/profile/g25uaj', '_blank');
-    }, 500);
-});
-
-bluePillBtn.addEventListener('click', () => {
-    pauseTyping(5000);
-    addToTerminal("> Executing: ./take_blue_pill");
-    addToTerminal("You chose the blue pill. Back to fiat dreams... or nightmares?");
-});
-
-hackBtn.addEventListener('click', () => {
-    pauseTyping(5000);
-    addToTerminal("> Executing: ./hack_contract");
-    navigator.clipboard.writeText(GLOBAL_PUMP_CA);
-    addToTerminal("Contract address copied to clipboard. System hacked.");
-});
-
-oracleBtn.addEventListener('click', () => {
-    pauseTyping(8000);
-    addToTerminal("> Executing: ./consult_oracle");
-    addToTerminal("Consulting the Oracle...");
-    setTimeout(() => {
-        addToTerminal("Roadmap: Fair launch -> 1M MC -> KOL takeover -> CEX listing");
-        addToTerminal("Metrics: System optimal. Network load: 3.4%. Moon progress: 42%");
-    }, 2000);
-});
-
-scanMatrixBtn.addEventListener('click', () => {
-    pauseTyping(7000);
-    addToTerminal("> Executing: ./scan_matrix");
-    addToTerminal("Scanning for glitches... anomalous patterns detected in sector 4.");
-    setTimeout(() => {
-        addToTerminal("Result: 14 agents identified. Whales positioning for liquidity event.");
-    }, 1500);
-});
-
-overrideSentinelBtn.addEventListener('click', () => {
-    pauseTyping(10000);
-    addToTerminal("> Executing: ./override_sentinel");
-    addToTerminal("CAUTION: Bypassing centralized firewalls...");
-    let i = 0;
-    const hackInterval = setInterval(() => {
-        if (i < 3) {
-            addToTerminal(`[BYPASSING_LAYER_${i + 1}]... OK`);
-            i++;
-        } else {
-            clearInterval(hackInterval);
-            addToTerminal("SENTINEL OVERRIDDEN. Anonymous mode: ENHANCED.");
-        }
-    }, 1000);
-});
-
-whiteRabbitBtn.addEventListener('click', () => {
-    pauseTyping(5000);
-    addToTerminal("> Executing: ./follow_white_rabbit");
-    const riddles = [
-        "What is real? How do you define 'real'?",
-        "The answer is out there, Neo. It's looking for you.",
-        "Everything that has a beginning has an end."
-    ];
-    addToTerminal(`White Rabbit: ${riddles[Math.floor(Math.random() * riddles.length)]}`);
-});
-
-dejaVuBtn.addEventListener('click', () => {
-    pauseTyping(6000);
-    addToTerminal("> Executing: ./trigger_deja_vu");
-    addToTerminal("A glitch in the Matrix... didn't I just see that buy order?");
-    document.body.classList.add('glitch-active');
-    setTimeout(() => {
-        document.body.classList.remove('glitch-active');
-        addToTerminal("Timeline synchronized. Carry on.");
-    }, 2000);
-});
-
-manifestDestinyBtn.addEventListener('click', () => {
-    pauseTyping(8000);
-    addToTerminal("> Executing: ./manifest_destiny");
-    addToTerminal("Calculating future trajectory of $TERM...");
-    setTimeout(() => {
-        const mc = (Math.random() * 100).toFixed(1);
-        addToTerminal(`Probability of Moon: 99.9%. Projected MC: $${mc}M`);
-    }, 2000);
-});
-
-function addToTerminal(text) {
-    const block = document.createElement('div');
-    block.className = 'command-output-block';
-    block.innerHTML = `<div class="typing-line">${text}</div>`;
-    terminalOutput.appendChild(block);
+    terminalOutput.appendChild(line);
     terminalOutput.scrollTop = terminalOutput.scrollHeight;
 }
 
-// Show Dashboard
-function showDashboard() {
-    terminalScreen.classList.remove('hidden');
-    startNarrative();
-}
+function typeText(text, callback) {
+    if (isTyping) return;
+    isTyping = true;
 
-// Eye Tracking Logic
-const eyeIris = document.getElementById('eye-iris');
-const watchingEye = document.getElementById('watching-eye');
+    const line = document.createElement('div');
+    line.className = 'font-mono text-sm md:text-base py-1 border-l-2 border-green-500/50 pl-3 text-green-400';
+    terminalOutput.appendChild(line);
 
-if (eyeIris && watchingEye) {
-    document.addEventListener('mousemove', (e) => {
-        const rect = watchingEye.getBoundingClientRect();
-        const eyeX = rect.left + rect.width / 2;
-        const eyeY = rect.top + rect.height / 2;
+    let i = 0;
+    const speed = 20; // ms
 
-        const angle = Math.atan2(e.clientY - eyeY, e.clientX - eyeX);
-        const distance = Math.min(6, Math.hypot(e.clientX - eyeX, e.clientY - eyeY) / 50);
-
-        const moveX = Math.cos(angle) * distance;
-        const moveY = Math.sin(angle) * distance;
-
-        eyeIris.style.transform = `translate(calc(-50% + ${moveX}px), calc(-50% + ${moveY}px))`;
-    });
-}
-
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', async () => {
-    showDashboard();
-    setInterval(updateCountdown, 1000); // Only set once
-
-    // Sync CA in header
-    const tokenCASpan = document.getElementById('tokenCA');
-    if (tokenCASpan && typeof GLOBAL_PUMP_CA !== 'undefined') {
-        tokenCASpan.textContent = GLOBAL_PUMP_CA;
+    function step() {
+        if (i < text.length) {
+            line.innerHTML += text.charAt(i);
+            terminalOutput.scrollTop = terminalOutput.scrollHeight;
+            i++;
+            setTimeout(step, speed);
+        } else {
+            isTyping = false;
+            if (callback) callback();
+        }
     }
+    step();
+}
 
-    updateSystemMetrics();
+// --- CORE LOGIC ---
 
-    // Custom Cursor Logic
-    const customCursor = document.getElementById('customCursor');
-    if (customCursor) {
-        document.addEventListener('mousemove', (e) => {
+// Custom Cursor Logic
+const customCursor = document.getElementById('customCursor');
+if (customCursor) {
+    document.addEventListener('mousemove', (e) => {
+        // Use requestAnimationFrame for smoother performance
+        requestAnimationFrame(() => {
             customCursor.style.left = e.clientX + 'px';
             customCursor.style.top = e.clientY + 'px';
         });
+    });
 
-        document.addEventListener('mousedown', () => {
-            customCursor.style.transform = 'translate(-50%, -50%) scale(0.8)';
+    // Add hover effect for clickable elements
+    const interactables = document.querySelectorAll('a, button, input, [role="button"]');
+    interactables.forEach(el => {
+        el.addEventListener('mouseenter', () => {
+            customCursor.style.width = '24px'; // Expand on hover
+            customCursor.style.height = '24px';
+            customCursor.style.mixBlendMode = 'exclusion'; // Cool inversion effect
         });
+        el.addEventListener('mouseleave', () => {
+            customCursor.style.width = '8px'; // Back to dot
+            customCursor.style.height = '8px';
+            customCursor.style.mixBlendMode = 'difference';
+        });
+    });
 
-        document.addEventListener('mouseup', () => {
-            customCursor.style.transform = 'translate(-50%, -50%) scale(1)';
-        });
+    // Click effect
+    document.addEventListener('mousedown', () => {
+        customCursor.style.transform = 'translate(-50%, -50%) scale(0.8)';
+        customCursor.style.backgroundColor = 'var(--term-green)';
+    });
+
+    document.addEventListener('mouseup', () => {
+        customCursor.style.transform = 'translate(-50%, -50%) scale(1)';
+        customCursor.style.backgroundColor = '#ffffff';
+    });
+}
+
+// 1. 3D Tilt Effect
+const glassPanel = document.getElementById('data-glass-panel');
+if (glassPanel) {
+    document.addEventListener('mousemove', (e) => {
+        if (window.innerWidth < 768) return; // Disable on mobile
+
+        const { clientX, clientY } = e;
+        const { innerWidth, innerHeight } = window;
+
+        // Calculate percentage from center (-1 to 1)
+        const xPct = (clientX / innerWidth - 0.5) * 2;
+        const yPct = (clientY / innerHeight - 0.5) * 2;
+
+        // Max rotation degrees
+        const maxRot = 5;
+
+        // RotateY depends on X position, RotateX depends on Y position (inverted)
+        const rotY = xPct * maxRot;
+        const rotX = -yPct * maxRot;
+
+        glassPanel.style.transform = `perspective(1000px) rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+    });
+}
+
+// 2. Button Handlers
+if (btnRoot) {
+    btnRoot.addEventListener('click', () => {
+        addToTerminal("> ./sudo_root", "info");
+        setTimeout(() => {
+            addToTerminal("ELEVATING PRIVILEGES...", "warn");
+            setTimeout(() => {
+                addToTerminal("ACCESS GRANTED. YOU ARE NOW SUPERUSER.", "success");
+            }, 1000);
+        }, 500);
+    });
+}
+
+if (btnLiquidity) {
+    btnLiquidity.addEventListener('click', () => {
+        addToTerminal("> ./inject_liquidity -f --max", "info");
+        setTimeout(() => {
+            addToTerminal("CONNECTING TO LIQUIDITY POOLS...", "info");
+            setTimeout(() => {
+                addToTerminal("INJECTING 100 SOL...", "success");
+            }, 1200);
+        }, 400);
+    });
+}
+
+if (btnMempool) {
+    btnMempool.addEventListener('click', () => {
+        addToTerminal("> ./scan_mempool", "info");
+        setTimeout(() => {
+            addToTerminal("SCANNING PENDING BLOCKS...", "warn");
+            // Simulate finding something
+            setTimeout(() => {
+                addToTerminal("WHALE TRANSACTION DETECTED: 500 SOL -> BUY", "success");
+            }, 1500);
+        }, 300);
+    });
+}
+
+if (btnSnipe) {
+    btnSnipe.addEventListener('click', () => {
+        addToTerminal("> ./execute_snipe", "error"); // Red for aggressive action
+        setTimeout(() => {
+            addToTerminal("TARGET LOCKED. CALCULATING GAS...", "warn");
+            setTimeout(() => {
+                addToTerminal("TX SENT. WAITING CONFIRMATION...", "info");
+                setTimeout(() => {
+                    addToTerminal("SNIPED SUCCESSFULLY. ENTRY: BLOCK 0", "success");
+                }, 2000);
+            }, 800);
+        }, 300);
+    });
+}
+
+if (btnCopy) {
+    btnCopy.addEventListener('click', () => {
+        if (GLOBAL_PUMP_CA) {
+            navigator.clipboard.writeText(GLOBAL_PUMP_CA).then(() => {
+                showToast("ADDRESS COPIED");
+                addToTerminal(`COPIED ADDRESS: ${GLOBAL_PUMP_CA}`, "success");
+            }).catch(console.error);
+        }
+    });
+}
+
+if (btnClear) {
+    btnClear.addEventListener('click', () => {
+        terminalOutput.innerHTML = '';
+        addToTerminal("LOGS CLEARED.", "info");
+    });
+}
+
+
+// 3. Init Narrative
+function initSystem() {
+    typeText("INITIALIZING ROOT PROTOCOL v9.0...", () => {
+        setTimeout(() => {
+            addToTerminal("CONNECTION SECURE.", "success");
+            addToTerminal("CONNECTED TO MAINNET.", "success");
+            addToTerminal("READY FOR COMMAND.", "info");
+        }, 500);
+    });
+}
+
+// 4. Fake Metrics
+setInterval(() => {
+    if (nodeCountDisplay) {
+        const base = 1337;
+        const flux = Math.floor(Math.random() * 50);
+        nodeCountDisplay.textContent = (base + flux).toLocaleString();
     }
-});
+}, 3000);
 
-// Make functions globally available (original)
+// Start
+document.addEventListener('DOMContentLoaded', initSystem);
+

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="assets/favicon.jpg">
-    <title>TERM - Privacy-Focused Anon Chat</title>
+    <title>ROOT - Ultimate System Access</title>
     <!-- Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Terminal Font -->
@@ -28,195 +28,235 @@
             --term-green: #00ff41;
             --term-purple: #9d00ff;
             --term-cyan: #00f3ff;
-            --term-bg: #030805;
-            --glass-bg: rgba(6, 18, 12, 0.4);
-            --glass-border: rgba(0, 255, 65, 0.2);
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-highlight: rgba(255, 255, 255, 0.2);
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
 
         body {
             font-family: 'Source Code Pro', monospace;
-            background-color: var(--term-bg);
+            background-color: #050505;
             color: #eee;
-            overflow: hidden;
-            cursor: none;
-            /* Hide default cursor */
+            overflow-x: hidden;
+            overflow-y: auto;
+            /* Enable scrolling */
+            cursor: none !important;
+            /* Force hide system cursor */
+            background-image: radial-gradient(circle at 50% 50%, #111 0%, #000 100%);
+            background-attachment: fixed;
+            /* Parallax effect base */
         }
 
-        /* Custom Cursor */
+        /* Enforce no cursor on interactables */
+        a,
+        button,
+        [role="button"],
+        input,
+        select,
+        textarea {
+            cursor: none !important;
+        }
+
+        /* Matrix Background Canvas - Fixed for Parallax */
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        /* Custom Cursor - White Dot */
         .custom-cursor {
             position: fixed;
             top: 0;
             left: 0;
-            width: 20px;
-            height: 20px;
-            pointer-events: none;
-            z-index: 10000;
-            transform: translate(-50%, -50%);
-            mix-blend-mode: screen;
-            transition: transform 0.1s ease-out;
-        }
-
-        .cursor-crosshair {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 100%;
-            height: 100%;
-            transform: translate(-50%, -50%);
-        }
-
-        .cursor-crosshair::before,
-        .cursor-crosshair::after {
-            content: '';
-            position: absolute;
-            background: var(--term-green);
-            box-shadow: 0 0 10px var(--term-green);
-        }
-
-        .cursor-crosshair::before {
-            top: 50%;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            transform: translateY(-50%);
-        }
-
-        .cursor-crosshair::after {
-            left: 50%;
-            top: 0;
-            width: 2px;
-            height: 100%;
-            transform: translateX(-50%);
-        }
-
-        .cursor-trail {
-            position: absolute;
-            top: 50%;
-            left: 50%;
             width: 8px;
+            /* Dot size */
             height: 8px;
-            background: rgba(0, 255, 65, 0.5);
+            background-color: #ffffff;
             border-radius: 50%;
+            pointer-events: none;
+            z-index: 99999;
+            /* Topmost */
             transform: translate(-50%, -50%);
-            filter: blur(2px);
-            transition: width 0.2s, height 0.2s;
+            /* Center on coords */
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px var(--term-green);
+            transition: width 0.2s, height 0.2s, background-color 0.2s;
+            mix-blend-mode: difference;
+            /* High visibility contrast */
         }
 
-        /* Hover effect */
-        body:hover .custom-cursor .cursor-trail {
-            width: 15px;
-            height: 15px;
-            background: rgba(0, 255, 65, 0.2);
+        /* Mobile: Hide custom cursor, restore default */
+        @media (hover: none) and (pointer: coarse) {
+            .custom-cursor {
+                display: none;
+            }
+
+            body,
+            a,
+            button {
+                cursor: auto !important;
+            }
         }
 
+        /* Hover State for Cursor */
+        body:active .custom-cursor {
+            width: 6px;
+            height: 6px;
+            background-color: var(--term-green);
+        }
 
-        /* Glassmorphism Classes */
-        .glass-panel {
+        /* Liquid Glass Theme */
+        .liquid-glass {
             background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
             border: 1px solid var(--glass-border);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        }
-
-        .glass-panel:hover {
-            border-color: rgba(0, 255, 65, 0.4);
-            box-shadow: 0 0 15px rgba(0, 255, 65, 0.1);
+            box-shadow:
+                0 4px 30px rgba(0, 0, 0, 0.5),
+                inset 0 0 0 1px var(--glass-highlight);
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
             transition: all 0.3s ease;
         }
 
-        /* CRT Overlay Effect */
+        /* Shine effect on glass */
+        .liquid-glass::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right,
+                    transparent,
+                    rgba(255, 255, 255, 0.1),
+                    transparent);
+            transform: skewX(-25deg);
+            transition: 0.5s;
+            pointer-events: none;
+        }
+
+        .liquid-glass:hover::before {
+            left: 150%;
+            transition: 0.7s;
+        }
+
+        .glass-btn {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .glass-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px) scale(1.02);
+            box-shadow:
+                0 10px 20px rgba(0, 0, 0, 0.2),
+                0 0 10px rgba(0, 255, 65, 0.2);
+            /* Green glow hint */
+            border-color: rgba(0, 255, 65, 0.3);
+            color: #fff;
+        }
+
+        .glass-btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        /* Terminal Text Styling */
+        .terminal-text {
+            color: var(--term-green);
+            text-shadow: 0 0 5px rgba(0, 255, 65, 0.3);
+        }
+
+        .terminal-warn {
+            color: #ff3333;
+            text-shadow: 0 0 5px rgba(255, 51, 51, 0.3);
+        }
+
+        .terminal-info {
+            color: var(--term-cyan);
+            text-shadow: 0 0 5px rgba(0, 243, 255, 0.3);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Section Styling */
+        section {
+            padding: 4rem 1rem;
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+            text-align: center;
+        }
+
+        /* Utility */
+        .hidden {
+            display: none !important;
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        /* Glitch Text for Headers */
+        .glitch-header {
+            position: relative;
+        }
+
+        /* CRT Overlay - Toned down for Glass theme */
         .crt-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.05) 50%);
             background-size: 100% 4px;
             pointer-events: none;
-            z-index: 9999;
-            opacity: 0.3;
-        }
-
-        .terminal-text {
-            color: var(--term-green);
-            text-shadow: 0 0 8px rgba(0, 255, 65, 0.5);
-        }
-
-        .neon-border {
-            border: 1px solid var(--term-green);
-            box-shadow: 0 0 10px rgba(0, 255, 65, 0.2), inset 0 0 5px rgba(0, 255, 65, 0.1);
-        }
-
-        .message-animation {
-            animation: slideIn 0.2s ease-out forwards;
-            opacity: 0;
-            border-left: 2px solid transparent;
-            padding-left: 8px;
-            margin-bottom: 4px;
-        }
-
-        .message-animation:hover {
-            border-left-color: var(--term-green);
-            background: rgba(0, 255, 65, 0.05);
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .cursor-blink {
-            animation: blink 1s step-end infinite;
-        }
-
-        @keyframes blink {
-            50% {
-                opacity: 0;
-            }
-        }
-
-        /* Glitch Effect */
-        .glitch-text {
-            position: relative;
-            display: inline-block;
-        }
-
-        .glitch-text::before,
-        .glitch-text::after {
-            content: attr(data-text);
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .glitch-text::before {
-            left: 2px;
-            text-shadow: -1px 0 #ff00c1;
-            clip: rect(44px, 450px, 56px, 0);
-            animation: glitch-anim 5s infinite linear alternate-reverse;
-        }
-
-        @keyframes glitch-anim {
-            0% {
-                clip: rect(32px, 9999px, 88px, 0);
-            }
-
-            5% {
-                clip: rect(72px, 9999px, 8px, 0);
-            }
-
-            /* ... truncated keyframes ... */
+            z-index: 9998;
+            /* Below cursor */
+            opacity: 0.15;
+            /* Reduced opacity */
         }
 
         /* Notification Toast */
@@ -225,579 +265,353 @@
             top: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0, 20, 0, 0.9);
+            background: rgba(10, 20, 15, 0.9);
+            backdrop-filter: blur(10px);
             border: 1px solid var(--term-green);
             color: var(--term-green);
-            padding: 10px 20px;
-            border-radius: 4px;
-            font-family: 'Source Code Pro', monospace;
+            padding: 12px 24px;
+            border-radius: 8px;
             font-size: 14px;
-            z-index: 10000;
-            box-shadow: 0 0 15px rgba(0, 255, 65, 0.3);
-            text-transform: uppercase;
-            letter-spacing: 2px;
+            z-index: 10001;
+            /* Above cursor fallback */
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+            letter-spacing: 1px;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.3s ease, top 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            top: -50px;
+            /* Start off screen */
         }
 
         #notification-toast.show {
             opacity: 1;
-            top: 80px;
-            /* Slide down slightly */
-        }
-
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--term-green);
-            border-radius: 10px;
-            opacity: 0.3;
-        }
-
-        .header-glass {
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(0, 255, 65, 0.3);
-        }
-
-        .ca-box {
-            background: rgba(0, 255, 65, 0.1);
-            border: 1px dashed var(--term-green);
-        }
-
-        .terminal-cursor {
-            display: inline-block;
-            width: 8px;
-            height: 16px;
-            background-color: var(--term-green);
-            animation: blink 1s infinite;
-        }
-
-        .typing-line {
-            border-left: 2px solid var(--term-green);
-            padding-left: 8px;
-            animation: fadeIn 0.5s ease-in;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .narrative-text {
-            margin-bottom: 8px;
-        }
-
-        .narrative-text:last-child {
-            border-left: 2px solid var(--term-green);
-            padding-left: 8px;
-        }
-
-        .command-output-block {
-            margin: 20px 0;
-            padding: 10px 0;
-            border-top: 1px dashed rgba(0, 255, 65, 0.1);
-            border-bottom: 1px dashed rgba(0, 255, 65, 0.1);
-            background: rgba(0, 255, 65, 0.02);
-        }
-
-        .clear-btn {
-            font-size: 10px;
-            color: var(--term-green);
-            opacity: 0.5;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            border: 1px solid rgba(0, 255, 65, 0.2);
-            padding: 2px 6px;
-            border-radius: 4px;
-        }
-
-        /* All-Seeing Eye Styling */
-        .eye-container {
-            width: 50px;
-            height: 30px;
-            background: #000;
-            border-radius: 100%;
-            position: relative;
-            overflow: hidden;
-            border: 2px solid rgba(0, 255, 65, 0.3);
-            box-shadow: 0 0 15px rgba(0, 255, 65, 0.1), inset 0 0 10px rgba(0, 0, 0, 0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-
-        .eye-container:hover {
-            border-color: rgba(0, 255, 65, 0.8);
-            box-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
-        }
-
-        .sclera {
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, #222 0%, #000 100%);
-            border-radius: 50%;
-            position: relative;
-        }
-
-        .iris {
-            width: 18px;
-            height: 18px;
-            background: radial-gradient(circle, #00ff41 0%, #003b00 70%, #000 100%);
-            border-radius: 50%;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
-            transition: all 0.1s ease-out;
-        }
-
-        .pupil {
-            width: 8px;
-            height: 8px;
-            background: #000;
-            border-radius: 50%;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            box-shadow: inset 0 0 5px rgba(0, 255, 65, 0.5);
-        }
-
-        .eye-reflection {
-            width: 4px;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.6);
-            border-radius: 50%;
-            position: absolute;
-            top: 30%;
-            left: 30%;
-        }
-
-        /* Advanced Hover Animations */
-        @keyframes pulse-red {
-            0% {
-                box-shadow: 0 0 5px rgba(239, 68, 68, 0.2);
-            }
-
-            50% {
-                box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
-            }
-
-            100% {
-                box-shadow: 0 0 5px rgba(239, 68, 68, 0.2);
-            }
-        }
-
-        @keyframes pulse-blue {
-            0% {
-                box-shadow: 0 0 5px rgba(59, 130, 246, 0.2);
-            }
-
-            50% {
-                box-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
-            }
-
-            100% {
-                box-shadow: 0 0 5px rgba(59, 130, 246, 0.2);
-            }
-        }
-
-        @keyframes jitter {
-            0% {
-                transform: translate(0);
-            }
-
-            25% {
-                transform: translate(1px, -1px);
-            }
-
-            50% {
-                transform: translate(-1px, 1px);
-            }
-
-            75% {
-                transform: translate(1px, 1px);
-            }
-
-            100% {
-                transform: translate(0);
-            }
-        }
-
-        @keyframes scanline-btn {
-            0% {
-                background-position: 0 -100%;
-            }
-
-            100% {
-                background-position: 0 100%;
-            }
-        }
-
-        @keyframes strobe {
-            0% {
-                opacity: 1;
-                border-color: white;
-            }
-
-            50% {
-                opacity: 0.5;
-                border-color: red;
-            }
-
-            100% {
-                opacity: 1;
-                border-color: white;
-            }
-        }
-
-        @keyframes shimmer {
-            0% {
-                background-position: -200% 0;
-            }
-
-            100% {
-                background-position: 200% 0;
-            }
-        }
-
-        @keyframes ghost {
-            0% {
-                text-shadow: 0 0 0 white;
-            }
-
-            50% {
-                text-shadow: 5px 0 10px rgba(255, 255, 255, 0.5), -5px 0 10px rgba(255, 255, 255, 0.5);
-            }
-
-            100% {
-                text-shadow: 0 0 0 white;
-            }
-        }
-
-        .btn-red-pill:hover {
-            animation: pulse-red 1.5s infinite;
-            transform: scale(1.05);
-        }
-
-        .btn-blue-pill:hover {
-            animation: pulse-blue 1.5s infinite;
-            transform: scale(1.05);
-        }
-
-        .btn-hack:hover {
-            animation: jitter 0.1s infinite;
-            text-shadow: 2px 0 red, -2px 0 blue;
-        }
-
-        .btn-oracle:hover {
-            box-shadow: 0 0 25px rgba(34, 211, 238, 0.4);
-            text-shadow: 0 0 8px rgba(34, 211, 238, 0.8);
-        }
-
-        .btn-scan:hover {
-            background: linear-gradient(transparent 50%, rgba(34, 211, 238, 0.1) 50%);
-            background-size: 100% 4px;
-            animation: scanline-btn 0.5s linear infinite;
-        }
-
-        .btn-override:hover {
-            animation: strobe 0.2s infinite;
-            color: #ff0000 !important;
-        }
-
-        .btn-rabbit:hover {
-            animation: ghost 1s infinite;
-            letter-spacing: 2px;
-        }
-
-        .btn-deja-vu:hover {
-            position: relative;
-        }
-
-        .btn-deja-vu:hover::before {
-            content: './trigger_deja_vu';
-            position: absolute;
-            left: 2px;
-            top: 1px;
-            opacity: 0.5;
-            color: yellow;
-            pointer-events: none;
-        }
-
-        .btn-destiny:hover {
-            background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.2), transparent);
-            background-size: 200% 100%;
-            animation: shimmer 1s infinite;
-            color: #d4af37 !important;
-        }
-
-        .clear-btn:hover {
-            opacity: 1;
-            background: rgba(0, 255, 65, 0.1);
-            box-shadow: 0 0 10px rgba(0, 255, 65, 0.2);
-        }
-
-        /* Glitch Animation for Deja Vu */
-        .glitch-active {
-            animation: glitch-skew 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
-        }
-
-        @keyframes glitch-skew {
-            0% {
-                transform: skew(0deg);
-            }
-
-            20% {
-                transform: skew(2deg);
-            }
-
-            40% {
-                transform: skew(-2deg);
-            }
-
-            60% {
-                transform: skew(1deg);
-            }
-
-            80% {
-                transform: skew(-1deg);
-            }
-
-            100% {
-                transform: skew(0deg);
-            }
-        }
-
-        @keyframes marquee {
-            0% {
-                transform: translateX(100%);
-            }
-
-            100% {
-                transform: translateX(-100%);
-            }
-        }
-
-        .animate-marquee {
-            animation: marquee 30s linear infinite;
-            padding-left: 100%;
-            /* Start off-screen */
-        }
-
-        /* Footer specific glow */
-        .footer-glow {
-            box-shadow: 0 -4px 20px rgba(0, 255, 65, 0.05);
+            top: 40px;
+            pointer-events: auto;
         }
     </style>
 </head>
 
-<body class="relative">
+<body class="relative min-h-screen w-full selection:bg-green-500/30 selection:text-green-200">
     <!-- CRT Effects -->
     <div class="crt-overlay"></div>
-    <div class="crt-vignette"></div>
 
     <!-- Notification Toast -->
-    <div id="notification-toast">WARNING: COPIED TO CLIPBOARD</div>
-
+    <div id="notification-toast">ROOT ACCESS GRANTED</div>
 
     <!-- Custom Cursor Container -->
-    <div id="customCursor" class="custom-cursor">
-        <div class="cursor-crosshair"></div>
-        <div class="cursor-trail"></div>
-    </div>
+    <div id="customCursor" class="custom-cursor"></div>
 
-    <!-- Premium Header -->
+    <!-- Glass Header -->
     <header
-        class="header-glass fixed top-0 left-0 w-full z-[5000] p-2 md:p-4 flex flex-col md:flex-row justify-between items-center space-y-3 md:space-y-0">
-        <div class="flex items-center space-x-4 w-full md:w-auto justify-between md:justify-start">
-            <div class="flex items-center space-x-3">
-                <div
-                    class="w-8 h-8 md:w-10 md:h-10 bg-green-500 rounded-full flex items-center justify-center neon-border">
-                    <i class="fas fa-microchip text-black text-sm md:text-base"></i>
+        class="fixed top-0 left-0 w-full z-50 p-4 transition-all duration-300 hover:bg-black/40 backdrop-blur-md border-b border-green-500/10">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <!-- Logo -->
+            <a href="#terminal-section" class="flex items-center space-x-3 group">
+                <div class="relative">
+                    <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse shadow-[0_0_15px_#00ff41]"></div>
+                    <div class="absolute inset-0 w-3 h-3 bg-green-400 rounded-full animate-ping opacity-20"></div>
                 </div>
                 <div>
-                    <h1 class="text-green-400 font-bold text-base md:text-lg tracking-widest glitch-text"
-                        data-text="TERM">
-                        TERM</h1>
-                    <div class="text-[8px] md:text-[10px] text-green-700 font-mono uppercase tracking-tighter">Secure
-                        Comms Protocol v3.1
+                    <h1
+                        class="text-white font-bold text-xl tracking-[0.2em] drop-shadow-[0_0_10px_rgba(0,255,65,0.5)] group-hover:text-green-400 transition-colors">
+                        ROOT</h1>
+                </div>
+            </a>
+
+            <!-- Nav Links (Desktop) -->
+            <nav class="hidden md:flex items-center space-x-4">
+                <a href="#terminal-section"
+                    class="px-4 py-1.5 rounded-full border border-transparent hover:border-green-500/30 hover:bg-green-500/10 text-xs text-white hover:text-green-400 uppercase tracking-widest transition-all duration-300 font-bold drop-shadow-md">
+                    <span class="text-green-500 mr-1">01</span> Terminal
+                </a>
+                <a href="#about"
+                    class="px-4 py-1.5 rounded-full border border-transparent hover:border-green-500/30 hover:bg-green-500/10 text-xs text-white hover:text-green-400 uppercase tracking-widest transition-all duration-300 font-bold drop-shadow-md">
+                    <span class="text-green-500 mr-1">02</span> System
+                </a>
+                <a href="#tokenomics"
+                    class="px-4 py-1.5 rounded-full border border-transparent hover:border-green-500/30 hover:bg-green-500/10 text-xs text-white hover:text-green-400 uppercase tracking-widest transition-all duration-300 font-bold drop-shadow-md">
+                    <span class="text-green-500 mr-1">03</span> Allocations
+                </a>
+                <a href="#roadmap"
+                    class="px-4 py-1.5 rounded-full border border-transparent hover:border-green-500/30 hover:bg-green-500/10 text-xs text-white hover:text-green-400 uppercase tracking-widest transition-all duration-300 font-bold drop-shadow-md">
+                    <span class="text-green-500 mr-1">04</span> Execution
+                </a>
+            </nav>
+
+            <!-- Right Side Metrics & Mobile Menu Checkbox -->
+            <div class="flex items-center space-x-4">
+                <div class="hidden md:flex liquid-glass px-4 py-1.5 space-x-4 items-center border-green-500/20">
+                    <div class="flex flex-col items-end">
+                        <span class="text-[9px] text-green-500/50 uppercase tracking-wider">Status</span>
+                        <span
+                            class="text-green-400 text-[10px] font-mono font-bold drop-shadow-[0_0_5px_rgba(0,255,65,0.5)]">ONLINE</span>
                     </div>
-                </div>
-            </div>
-            <!-- Mobile-only status/countdown container -->
-            <div class="flex md:hidden items-center space-x-3 overflow-hidden">
-                <div class="flex flex-col items-end">
-                    <span id="countdownTimerMobile"
-                        class="text-green-400 text-[10px] font-mono animate-pulse">00:00:00</span>
-                    <span class="text-green-400 text-[8px] animate-pulse">MATRIX: LOADED</span>
-                </div>
-            </div>
-        </div>
-
-        </div>
-
-        <!-- NEW: System Metrics (Left Side Feature) -->
-        <div class="hidden xl:flex flex-col space-y-1 p-2 border-r border-green-900/30 mr-4">
-            <div class="flex items-center space-x-2">
-                <span class="text-[8px] text-green-700">CPU</span>
-                <div class="w-16 h-1 bg-green-900/30 rounded overflow-hidden">
-                    <div id="cpu-bar" class="h-full bg-green-500 w-1/3 transition-all duration-300"></div>
-                </div>
-                <span id="cpu-val" class="text-[8px] text-green-400 font-mono">34%</span>
-            </div>
-            <div class="flex items-center space-x-2">
-                <span class="text-[8px] text-green-700">RAM</span>
-                <div class="w-16 h-1 bg-green-900/30 rounded overflow-hidden">
-                    <div id="ram-bar" class="h-full bg-green-500 w-2/3 transition-all duration-500"></div>
-                </div>
-                <span id="ram-val" class="text-[8px] text-green-400 font-mono">67%</span>
-            </div>
-        </div>
-
-        <div class="w-full md:flex-1 md:max-w-xl md:px-12">
-            <div class="ca-box p-1.5 md:p-2 rounded flex items-center justify-between group cursor-pointer"
-                onclick="copyCA()">
-                <div class="flex items-center space-x-2 overflow-hidden">
-                    <span class="text-green-800 text-[9px] md:text-[10px] font-bold">CONTRACT:</span>
-                    <span id="tokenCA" class="text-green-400 text-[10px] md:text-xs font-mono truncate">Click TO COPY TERM CA*****</span>
-                </div>
-                <i class="fas fa-copy text-green-800 group-hover:text-green-400 transition-colors text-xs"></i>
-            </div>
-        </div>
-
-        <div class="hidden md:flex items-center space-x-6">
-            <!-- NEW: Node Map / Net Status (Right Side Feature) -->
-            <div class="hidden lg:block">
-                <div class="border border-green-900/50 bg-black/40 p-1.5 rounded flex items-center space-x-2">
-                    <div class="grid grid-cols-3 gap-0.5">
-                        <div class="w-1 h-1 bg-green-500 rounded-full animate-pulse"></div>
-                        <div class="w-1 h-1 bg-green-800 rounded-full"></div>
-                        <div class="w-1 h-1 bg-green-600 rounded-full"></div>
-                        <div class="w-1 h-1 bg-green-900 rounded-full"></div>
-                        <div class="w-1 h-1 bg-green-400 rounded-full animate-ping"></div>
-                        <div class="w-1 h-1 bg-green-700 rounded-full"></div>
-                    </div>
-                    <div class="flex flex-col">
-                        <span class="text-[8px] text-green-500 font-bold">NET_LATTICE</span>
-                        <span class="text-[7px] text-green-800">NODES: <span class="text-green-300">ACTIVE</span></span>
-                    </div>
-                </div>
-            </div>
-
-            <div id="launchCountdown" class="flex items-center space-x-2 border-l border-green-900/30 pl-4">
-                <div class="flex flex-col items-end">
-                    <span class="text-[8px] text-green-800 uppercase tracking-wider">T-Minus</span>
-                    <span id="countdownTimerDesktop"
-                        class="text-green-400 text-xs font-mono animate-pulse">00:00:00</span>
-                </div>
-            </div>
-            <div id="connectionStatus" class="flex items-center space-x-2">
-                <i class="fas fa-wifi text-[10px] text-green-600 animate-pulse"></i>
-                <div class="flex flex-col">
-                    <span class="text-[8px] text-green-800">Link Status</span>
-                    <span class="text-green-400 text-[10px] font-bold">SECURE</span>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main id="terminalScreen" class="pt-32 md:pt-24 pb-4 px-2 md:px-4 h-screen flex flex-col relative z-10">
-        <div class="flex-1 flex items-center justify-center">
-            <div
-                class="glass-panel p-4 md:p-8 rounded-xl max-w-4xl w-full flex flex-col h-full max-h-[85vh] md:max-h-[80vh]">
+    <!-- CONTENT WRAPPER -->
+    <div class="relative pt-20"> <!-- Padding for fixed header -->
+
+        <!-- SECTION 1: TERMINAL (HERO) -->
+        <main id="terminal-section"
+            class="min-h-screen flex items-center justify-center p-4 relative z-10 perspective-1000">
+
+            <!-- Main Glass Terminal Window -->
+            <div id="data-glass-panel"
+                class="liquid-glass w-full max-w-5xl h-[75vh] flex flex-col p-1 transition-transform duration-100 ease-out preserve-3d border-green-500/10 hover:shadow-[0_0_50px_rgba(0,255,65,0.05)]">
+
+                <!-- Window Header / Controls -->
                 <div
-                    class="flex flex-col md:flex-row justify-between items-center border-b border-green-900/30 pb-2 md:pb-4 mb-4 md:mb-6 space-y-3 md:space-y-0">
-                    <span class="text-green-400 text-base md:text-lg font-bold tracking-widest glitch-text"
-                        data-text="MATRIX_TERMINAL">
-                        MATRIX_TERMINAL</span>
-                    <div class="flex flex-col sm:flex-row items-center justify-between w-full md:w-auto gap-3">
-                        <div class="flex space-x-2 w-full sm:w-auto">
-                            <button id="clearMindBtn"
-                                class="clear-btn flex-1 sm:flex-none font-mono uppercase tracking-tighter text-[9px] md:text-[10px] py-1 md:py-1">
-                                [ CLEAR ]
+                    class="flex justify-between items-center p-3 border-b border-green-500/10 bg-black/40 backdrop-blur-md rounded-t-lg">
+                    <div class="flex space-x-2">
+                        <div class="w-3 h-3 rounded-full bg-red-500/50 border border-white/10"></div>
+                        <div class="w-3 h-3 rounded-full bg-yellow-500/50 border border-white/10"></div>
+                        <div
+                            class="w-3 h-3 rounded-full bg-green-500/50 border border-white/10 shadow-[0_0_8px_rgba(0,255,65,0.5)]">
+                        </div>
+                    </div>
+                    <div class="text-xs text-green-500/50 font-mono tracking-widest">root@system:~</div>
+                    <div class="w-10"></div> <!-- Spacer for balance -->
+                </div>
+
+                <!-- Terminal Output Area -->
+                <div id="terminal-output"
+                    class="flex-1 overflow-y-auto p-6 font-mono text-sm md:text-base leading-relaxed space-y-2 relative scroll-smooth">
+                    <!-- Content will be injected here by app.js -->
+                </div>
+
+                <!-- Input / Controls Area -->
+                <div class="p-4 md:p-6 border-t border-green-500/10 bg-black/40 backdrop-blur-sm rounded-b-lg">
+                    <div class="flex flex-col space-y-4">
+
+                        <!-- Command Buttons Grid -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            <button id="btn-root-access"
+                                class="glass-btn py-3 px-4 rounded-lg text-xs md:text-sm font-mono tracking-wide text-left flex items-center justify-between group border-green-500/20 hover:border-green-500/50">
+                                <span class="group-hover:text-green-300 transition-colors">./sudo_root</span>
+                                <span
+                                    class="opacity-0 group-hover:opacity-100 transition-opacity text-green-400">>></span>
                             </button>
-                            <button id="resetSystemBtn"
-                                class="clear-btn flex-1 sm:flex-none font-mono uppercase tracking-tighter text-[9px] md:text-[10px] py-1 md:py-1">
-                                [ RESET ]
+                            <button id="btn-inject-liquidity"
+                                class="glass-btn py-3 px-4 rounded-lg text-xs md:text-sm font-mono tracking-wide text-left flex items-center justify-between group border-green-500/20 hover:border-green-500/50">
+                                <span class="group-hover:text-green-300 transition-colors">./inject_liquidity</span>
+                                <span
+                                    class="opacity-0 group-hover:opacity-100 transition-opacity text-green-400">>></span>
+                            </button>
+                            <button id="btn-scan-mempool"
+                                class="glass-btn py-3 px-4 rounded-lg text-xs md:text-sm font-mono tracking-wide text-left flex items-center justify-between group border-green-500/20 hover:border-green-500/50">
+                                <span class="group-hover:text-green-300 transition-colors">./scan_mempool</span>
+                                <span
+                                    class="opacity-0 group-hover:opacity-100 transition-opacity text-green-400">>></span>
+                            </button>
+                            <button id="btn-execute-snipe"
+                                class="glass-btn py-3 px-4 rounded-lg text-xs md:text-sm font-mono tracking-wide text-left flex items-center justify-between group border-green-500/20 hover:border-green-500/50">
+                                <span class="group-hover:text-green-300 transition-colors">./execute_snipe</span>
+                                <span
+                                    class="opacity-0 group-hover:opacity-100 transition-opacity text-green-400">>></span>
                             </button>
                         </div>
-                        <div class="flex items-center space-x-2 justify-center sm:justify-end">
-                            <span
-                                class="text-green-400 text-[9px] md:text-xs animate-pulse whitespace-nowrap">LAUNCH_SEQUENCE_ACTIVE</span>
-                            <div class="w-2 h-2 rounded-full bg-green-500 animate-ping"></div>
+
+                        <!-- Secondary Controls -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            <button id="btn-copy-ca"
+                                class="glass-btn py-2 px-3 rounded text-[10px] md:text-xs font-mono text-gray-500 hover:text-white flex items-center justify-center space-x-2 col-span-2 md:col-span-1 border-dashed border-green-500/20 hover:border-green-500/50 group">
+                                <i class="fas fa-copy group-hover:text-green-400"></i>
+                                <span id="ca-display-truncated" class="group-hover:text-green-400">COPY CONTRACT</span>
+                            </button>
+                            <button id="btn-clear"
+                                class="glass-btn py-2 px-3 rounded text-[10px] md:text-xs font-mono text-gray-600 hover:text-red-400 border-transparent hover:border-red-500/20">
+                                [ CLEAR_LOGS ]
+                            </button>
                         </div>
+
                     </div>
                 </div>
 
-                <div id="terminal-output"
-                    class="flex-1 overflow-y-auto font-mono text-green-400 text-sm space-y-2 custom-scrollbar">
-                    <!-- Narrative text will be typed here -->
-                </div>
+            </div>
+        </main>
 
-                <div id="terminal-input"
-                    class="grid grid-cols-2 sm:flex sm:flex-wrap items-center justify-center gap-2 mt-4 md:mt-6 pt-4 border-t border-green-900/30">
-                    <button id="redPillBtn"
-                        class="btn-red-pill bg-transparent hover:bg-white/10 text-white/70 hover:text-red-500 px-2 md:px-3 py-1.5 rounded border border-white/20 font-mono text-[10px] md:text-xs tracking-tight transition-all truncate">
-                        ./take_red_pill
-                    </button>
-                    <button id="bluePillBtn"
-                        class="btn-blue-pill bg-transparent hover:bg-white/10 text-white/70 hover:text-blue-500 px-2 md:px-3 py-1.5 rounded border border-white/20 font-mono text-[10px] md:text-xs tracking-tight transition-all truncate">
-                        ./take_blue_pill
-                    </button>
-                    <button id="hackBtn"
-                        class="btn-hack bg-transparent hover:bg-white/10 text-white/70 px-2 md:px-3 py-1.5 rounded border border-white/20 font-mono text-[10px] md:text-xs tracking-tight transition-all truncate">
-                        ./hack_contract
-                    </button>
-                    <button id="oracleBtn"
-                        class="btn-oracle bg-transparent hover:bg-white/10 text-white/70 px-2 md:px-3 py-1.5 rounded border border-white/20 font-mono text-[10px] md:text-xs tracking-tight transition-all truncate">
-                        ./consult_oracle
-                    </button>
-                    <!-- New Buttons -->
-                    <button id="scanMatrixBtn"
-                        class="btn-scan bg-transparent hover:bg-white/10 text-white/70 px-2 md:px-3 py-1.5 rounded border border-white/20 font-mono text-[10px] md:text-xs tracking-tight transition-all truncate">
-                        ./scan_matrix
-                    </button>
-                    <button id="overrideSentinelBtn"
-                        class="btn-override bg-transparent hover:bg-white/10 text-white/70 px-2 md:px-3 py-1.5 rounded border border-white/20 font-mono text-[10px] md:text-xs tracking-tight transition-all truncate">
-                        ./override_sentinel
-                    </button>
-                    <button id="whiteRabbitBtn"
-                        class="btn-rabbit bg-transparent hover:bg-white/10 text-white/70 px-2 md:px-3 py-1.5 rounded border border-white/20 font-mono text-[10px] md:text-xs tracking-tight transition-all truncate">
-                        ./follow_white_rabbit
-                    </button>
-                    <button id="dejaVuBtn"
-                        class="btn-deja-vu bg-transparent hover:bg-white/10 text-white/70 px-2 md:px-3 py-1.5 rounded border border-white/20 font-mono text-[10px] md:text-xs tracking-tight transition-all truncate">
-                        ./trigger_deja_vu
-                    </button>
-                    <button id="manifestDestinyBtn"
-                        class="btn-destiny bg-transparent hover:bg-white/10 text-white/70 px-2 md:px-3 py-1.5 rounded border border-white/20 font-mono text-[10px] md:text-xs tracking-tight transition-all truncate col-span-2 sm:col-auto">
-                        ./manifest_destiny
-                    </button>
+        <!-- SECTION 2: SYSTEM ARCHITECTURE (ABOUT) -->
+        <section id="about">
+            <div class="container mx-auto px-4">
+                <div
+                    class="liquid-glass p-8 md:p-12 max-w-4xl mx-auto border-green-500/20 hover:border-green-500/40 hover:shadow-[0_0_30px_rgba(0,255,65,0.1)] transition-all duration-500">
+                    <h2 class="section-title text-green-500 drop-shadow-[0_0_10px_rgba(0,255,65,0.3)]">SYSTEM
+                        ARCHITECTURE</h2>
+                    <div class="grid md:grid-cols-2 gap-8 items-center">
+                        <div class="space-y-4 text-gray-300 font-mono text-sm leading-relaxed">
+                            <p>ROOT is not just a token; it is a permissionless protocol designed to bypass the firewall
+                                of centralized finance.</p>
+                            <p>Built on the Solana lattice, ROOT grants users superuser privileges to interact directly
+                                with the mempool, sniping opportunities before they are indexed by the mainstream.</p>
+                            <div class="flex items-center space-x-2 text-green-400 pt-4 group">
+                                <i class="fas fa-check-circle group-hover:scale-125 transition-transform"></i>
+                                <span class="group-hover:text-white transition-colors">Non-Custodial Root Access</span>
+                            </div>
+                            <div class="flex items-center space-x-2 text-green-400 group">
+                                <i class="fas fa-check-circle group-hover:scale-125 transition-transform"></i>
+                                <span class="group-hover:text-white transition-colors">Zero-Latency Execution</span>
+                            </div>
+                        </div>
+                        <!-- Decorative Graphic Placeholder using CSS shapes -->
+                        <div class="relative h-64 w-full flex items-center justify-center">
+                            <div
+                                class="absolute w-40 h-40 border border-green-500/20 rounded-full animate-[spin_10s_linear_infinite]">
+                            </div>
+                            <div
+                                class="absolute w-32 h-32 border border-green-500/40 rounded-full animate-[spin_15s_linear_infinite_reverse]">
+                            </div>
+                            <div
+                                class="absolute w-56 h-56 border-dashed border-green-500/10 rounded-full animate-pulse">
+                            </div>
+                            <div class="text-3xl font-bold text-green-500 tracking-wider animate-pulse font-mono">CORE
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </main>
+        </section>
+
+        <!-- SECTION 3: TOKENOMICS -->
+        <section id="tokenomics">
+            <div class="container mx-auto px-4">
+                <div
+                    class="liquid-glass p-8 md:p-12 max-w-5xl mx-auto border-green-500/20 hover:border-green-500/40 hover:shadow-[0_0_30px_rgba(0,255,65,0.1)] transition-all duration-500">
+                    <h2 class="section-title text-green-500 drop-shadow-[0_0_10px_rgba(0,255,65,0.3)]">RESOURCE
+                        ALLOCATION</h2>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                        <!-- Stat 1 -->
+                        <div
+                            class="p-6 rounded-lg bg-black/20 border border-green-500/10 hover:border-green-500/50 hover:bg-green-500/5 transition-all duration-300 group">
+                            <div
+                                class="text-4xl font-bold text-white mb-2 group-hover:scale-110 group-hover:text-green-400 transition-all shadow-green-500/50">
+                                1B</div>
+                            <div class="text-xs text-green-500/70 uppercase tracking-widest group-hover:text-green-400">
+                                Total Supply</div>
+                        </div>
+                        <!-- Stat 2 -->
+                        <div
+                            class="p-6 rounded-lg bg-black/20 border border-green-500/10 hover:border-green-500/50 hover:bg-green-500/5 transition-all duration-300 group">
+                            <div
+                                class="text-4xl font-bold text-white mb-2 group-hover:scale-110 group-hover:text-green-400 transition-all">
+                                0%</div>
+                            <div class="text-xs text-green-500/70 uppercase tracking-widest group-hover:text-green-400">
+                                Tax (Buy/Sell)</div>
+                        </div>
+                        <!-- Stat 3 -->
+                        <div
+                            class="p-6 rounded-lg bg-black/20 border border-green-500/10 hover:border-green-500/50 hover:bg-green-500/5 transition-all duration-300 group">
+                            <div
+                                class="text-4xl font-bold text-white mb-2 group-hover:scale-110 group-hover:text-green-400 transition-all">
+                                100%</div>
+                            <div class="text-xs text-green-500/70 uppercase tracking-widest group-hover:text-green-400">
+                                Liquidity Burned</div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 text-center">
+                        <div
+                            class="inline-block px-6 py-2 border border-green-500/30 rounded-full bg-green-500/10 text-green-400 font-mono text-xs hover:bg-green-500/20 hover:scale-105 transition-all cursor-none">
+                            CA: <span id="tokenCA-section" class="text-white font-bold ml-2">Click TO COPY TERM
+                                CA*****</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: ROADMAP -->
+        <section id="roadmap" class="mb-20">
+            <div class="container mx-auto px-4">
+                <div
+                    class="liquid-glass p-8 md:p-12 max-w-4xl mx-auto border-green-500/20 hover:border-green-500/40 hover:shadow-[0_0_30px_rgba(0,255,65,0.1)] transition-all duration-500">
+                    <h2 class="section-title text-green-500 drop-shadow-[0_0_10px_rgba(0,255,65,0.3)]">EXECUTION PLAN
+                    </h2>
+
+                    <div
+                        class="space-y-8 relative before:absolute before:inset-0 before:ml-5 before:h-full before:w-0.5 before:-translate-x-px before:bg-gradient-to-b before:from-transparent before:via-green-900 before:to-transparent md:before:mx-auto md:before:translate-x-0">
+
+                        <!-- Phase 1 -->
+                        <div
+                            class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                            <div
+                                class="flex items-center justify-center w-10 h-10 rounded-full border border-green-400 bg-green-500/20 shadow-[0_0_15px_#00ff41] shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 backdrop-blur-sm">
+                                <div class="w-2 h-2 bg-white rounded-full"></div>
+                            </div>
+                            <div
+                                class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded liquid-glass border-green-500/30 hover:bg-green-500/5 transition-colors">
+                                <div class="flex items-center justify-between mb-1">
+                                    <h3 class="font-bold text-white group-hover:text-green-400 transition-colors">
+                                        PHASE 1: INJECTION</h3>
+                                    <span
+                                        class="text-[10px] bg-green-500/20 text-green-400 px-2 py-0.5 rounded border border-green-500/30">COMPLETED</span>
+                                </div>
+                                <ul
+                                    class="text-xs text-gray-400 font-mono list-disc list-inside group-hover:text-gray-300">
+                                    <li>System Initialization</li>
+                                    <li>Contract Deployment</li>
+                                    <li>Liquidity Burn</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Phase 2 -->
+                        <div
+                            class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
+                            <div
+                                class="flex items-center justify-center w-10 h-10 rounded-full border border-green-500/30 bg-black shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
+                                <div class="w-2 h-2 bg-green-600 rounded-full animate-pulse"></div>
+                            </div>
+                            <div
+                                class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded liquid-glass border-green-500/10 hover:border-green-500/30 hover:bg-green-500/5 transition-all">
+                                <div class="flex items-center justify-between mb-1">
+                                    <h3 class="font-bold text-gray-300 group-hover:text-green-300 transition-colors">
+                                        PHASE 2: ESCALATION</h3>
+                                    <span
+                                        class="text-[10px] bg-green-900/40 text-green-600 px-2 py-0.5 rounded border border-green-900/50">IN
+                                        PROGRESS</span>
+                                </div>
+                                <ul
+                                    class="text-xs text-gray-500 font-mono list-disc list-inside group-hover:text-gray-400">
+                                    <li>Holder Growth (1k Nodes)</li>
+                                    <li>Marketing Campaign (Signal Broadcast)</li>
+                                    <li>CEX Listings (Public Uplink)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Phase 3 -->
+                        <div
+                            class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
+                            <div
+                                class="flex items-center justify-center w-10 h-10 rounded-full border border-white/5 bg-black shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
+                                <div class="w-2 h-2 bg-gray-600 rounded-full"></div>
+                            </div>
+                            <div
+                                class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded liquid-glass opacity-50 hover:opacity-100 transition-opacity border-transparent">
+                                <div class="flex items-center justify-between mb-1">
+                                    <h3 class="font-bold text-gray-400">PHASE 3: TOTAL CONTROL</h3>
+                                    <span
+                                        class="text-[10px] bg-gray-800 text-gray-500 px-2 py-0.5 rounded">PENDING</span>
+                                </div>
+                                <ul class="text-xs text-gray-600 font-mono list-disc list-inside">
+                                    <li>Proprietary Tooling Release</li>
+                                    <li>DAO Governance (Root Access)</li>
+                                    <li>The Singularity</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
 
     <!-- Footer -->
     <!-- Mystic Footer -->
