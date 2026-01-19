@@ -190,7 +190,7 @@ if (btnSnipe) {
             setTimeout(() => {
                 addToTerminal("TX SENT. WAITING CONFIRMATION...", "info");
                 setTimeout(() => {
-                    addToTerminal("SNIPED SUCCESSFULLY. ENTRY: BLOCK 0", "success");
+                    addToTerminal("SNIPED SUCCESSFULLY. ENTRY: BLOCK 4", "success");
                 }, 2000);
             }, 800);
         }, 300);
