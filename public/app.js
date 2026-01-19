@@ -163,7 +163,7 @@ if (btnLiquidity) {
         setTimeout(() => {
             addToTerminal("CONNECTING TO LIQUIDITY POOLS...", "info");
             setTimeout(() => {
-                addToTerminal("INJECTING 100 SOL...", "success");
+                addToTerminal("INJECTING 0.6 SOL...", "success");
             }, 1200);
         }, 400);
     });
@@ -176,7 +176,7 @@ if (btnMempool) {
             addToTerminal("SCANNING PENDING BLOCKS...", "warn");
             // Simulate finding something
             setTimeout(() => {
-                addToTerminal("WHALE TRANSACTION DETECTED: 500 SOL -> BUY", "success");
+                addToTerminal("WHALE TRANSACTION DETECTED: 1 SOL -> BUY", "success");
             }, 1500);
         }, 300);
     });
@@ -305,9 +305,14 @@ document.addEventListener('DOMContentLoaded', () => {
     initSystem();
     initScrollObserver();
 
+    // Explicitly check for the first section to avoid "empty" load states
+    const firstSection = document.querySelector('main');
+    if (firstSection && window.scrollY < 100) {
+        firstSection.classList.add('active-section');
+    }
+
     // Force notification to confirm update
     setTimeout(() => {
-        showToast("SYSTEM UPDATED v2.1: INTERFACE RELOADED");
+        showToast("SYSTEM UPDATED v2.3: LOGIC RE-CALIBRATED");
     }, 2000);
 });
-

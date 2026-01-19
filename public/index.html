@@ -243,19 +243,7 @@
             /* Remove padding as we center content in full height */
         }
 
-        /* Animation classes */
-        .section-animate {
-            opacity: 0;
-            filter: blur(10px);
-            transform: scale(0.95) translateY(30px);
-            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
-        }
 
-        .active-section .section-animate {
-            opacity: 1;
-            filter: blur(0);
-            transform: scale(1) translateY(0);
-        }
 
         /* Page Indicator - Centered in Header */
         #page-indicator {
@@ -294,10 +282,7 @@
             text-align: center;
         }
 
-        /* Utility */
-        .hidden {
-            display: none !important;
-        }
+
 
         .flex {
             display: flex;
@@ -369,12 +354,12 @@
     <!-- Glass Header -->
     <header
         class="fixed top-0 left-0 w-full z-50 p-4 transition-all duration-300 hover:bg-black/40 backdrop-blur-md border-b border-green-500/10">
-        <div class="max-w-7xl mx-auto flex justify-between items-center relative">
-            <!-- Dynamic Page Name Indicator -->
+        <div class="max-w-7xl mx-auto flex justify-between items-center relative h-16 px-6">
+            <!-- Dynamic Page Name Indicator (Absolute Centered) -->
             <div id="page-indicator">root@system:~</div>
 
-            <!-- Logo -->
-            <a href="#terminal-section" class="flex items-center space-x-3 group">
+            <!-- Logo (Left) -->
+            <a href="#terminal-section" class="flex items-center space-x-3 group relative z-20">
                 <div class="relative">
                     <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse shadow-[0_0_15px_#00ff41]"></div>
                     <div class="absolute inset-0 w-3 h-3 bg-green-400 rounded-full animate-ping opacity-20"></div>
@@ -382,39 +367,20 @@
                 <div>
                     <h1
                         class="text-white font-bold text-xl tracking-[0.2em] drop-shadow-[0_0_10px_rgba(0,255,65,0.5)] group-hover:text-green-400 transition-colors">
-                        ROOT</h1>
+                        ROOT
+                    </h1>
                 </div>
             </a>
 
-            <!-- Nav Links (Desktop) -->
-            <nav class="hidden md:flex items-center space-x-4">
-                <a href="#terminal-section"
-                    class="px-4 py-1.5 rounded-full border border-transparent hover:border-green-500/30 hover:bg-green-500/10 text-xs text-white hover:text-green-400 uppercase tracking-widest transition-all duration-300 font-bold drop-shadow-md">
-                    <span class="text-green-500 mr-1">01</span> Terminal
+            <!-- Right Side (Right) -->
+            <div class="flex items-center space-x-4 relative z-20">
+                <!-- Build by Rantol Dev Button -->
+                <a href="https://pump.fun/profile/rantoldev" target="_blank"
+                    class="flex px-4 py-1.5 rounded-full border-2 border-green-500 text-[10px] text-white bg-green-500/10 hover:bg-green-500 hover:text-black transition-all duration-300 font-bold uppercase tracking-widest items-center shadow-[0_0_20px_rgba(0,255,65,0.3)] group/btn">
+                    Build by Rantol Dev
+                    <i
+                        class="fas fa-external-link-alt ml-2 text-[8px] opacity-70 group-hover/btn:opacity-100 transition-opacity"></i>
                 </a>
-                <a href="#about"
-                    class="px-4 py-1.5 rounded-full border border-transparent hover:border-green-500/30 hover:bg-green-500/10 text-xs text-white hover:text-green-400 uppercase tracking-widest transition-all duration-300 font-bold drop-shadow-md">
-                    <span class="text-green-500 mr-1">02</span> System
-                </a>
-                <a href="#tokenomics"
-                    class="px-4 py-1.5 rounded-full border border-transparent hover:border-green-500/30 hover:bg-green-500/10 text-xs text-white hover:text-green-400 uppercase tracking-widest transition-all duration-300 font-bold drop-shadow-md">
-                    <span class="text-green-500 mr-1">03</span> Allocations
-                </a>
-                <a href="#roadmap"
-                    class="px-4 py-1.5 rounded-full border border-transparent hover:border-green-500/30 hover:bg-green-500/10 text-xs text-white hover:text-green-400 uppercase tracking-widest transition-all duration-300 font-bold drop-shadow-md">
-                    <span class="text-green-500 mr-1">04</span> Execution
-                </a>
-            </nav>
-
-            <!-- Right Side Metrics & Mobile Menu Checkbox -->
-            <div class="flex items-center space-x-4">
-                <div class="hidden md:flex liquid-glass px-4 py-1.5 space-x-4 items-center border-green-500/20">
-                    <div class="flex flex-col items-end">
-                        <span class="text-[9px] text-green-500/50 uppercase tracking-wider">Status</span>
-                        <span
-                            class="text-green-400 text-[10px] font-mono font-bold drop-shadow-[0_0_5px_rgba(0,255,65,0.5)]">ONLINE</span>
-                    </div>
-                </div>
             </div>
         </div>
     </header>
@@ -424,11 +390,11 @@
 
         <!-- SECTION 1: TERMINAL (HERO) -->
         <main id="terminal-section" data-title="root@system:~"
-            class="min-h-screen flex items-center justify-center p-4 relative z-10 perspective-1000 section-animate">
+            class="min-h-screen flex items-center justify-center p-4 relative z-10">
 
             <!-- Main Glass Terminal Window -->
             <div id="data-glass-panel"
-                class="liquid-glass w-full max-w-5xl h-[75vh] flex flex-col p-1 transition-transform duration-100 ease-out preserve-3d border-green-500/10 hover:shadow-[0_0_50px_rgba(0,255,65,0.05)] section-animate">
+                class="liquid-glass w-full max-w-5xl h-[75vh] flex flex-col p-1 border-green-500/10 hover:shadow-[0_0_50px_rgba(0,255,65,0.05)]">
 
                 <!-- Window Header / Controls -->
                 <div
@@ -504,7 +470,7 @@
         <!-- SECTION 2: SYSTEM ARCHITECTURE (ABOUT) -->
         <!-- SECTION 2: SYSTEM ARCHITECTURE (ABOUT) -->
         <section id="about" data-title="SYSTEM ARCHITECTURE">
-            <div class="container mx-auto px-4 section-animate">
+            <div class="container mx-auto px-4 ">
                 <div
                     class="liquid-glass p-8 md:p-12 max-w-4xl mx-auto border-green-500/20 hover:border-green-500/40 hover:shadow-[0_0_30px_rgba(0,255,65,0.1)] transition-all duration-500">
                     <h2 class="section-title text-green-500 drop-shadow-[0_0_10px_rgba(0,255,65,0.3)]">SYSTEM
@@ -545,7 +511,7 @@
 
         <!-- SECTION 3: TOKENOMICS -->
         <section id="tokenomics" data-title="RESOURCE ALLOCATION">
-            <div class="container mx-auto px-4 section-animate">
+            <div class="container mx-auto px-4 ">
                 <div
                     class="liquid-glass p-8 md:p-12 max-w-5xl mx-auto border-green-500/20 hover:border-green-500/40 hover:shadow-[0_0_30px_rgba(0,255,65,0.1)] transition-all duration-500">
                     <h2 class="section-title text-green-500 drop-shadow-[0_0_10px_rgba(0,255,65,0.3)]">RESOURCE
@@ -594,7 +560,7 @@
 
         <!-- SECTION 4: ROADMAP -->
         <section id="roadmap" class="mb-20" data-title="EXECUTION PLAN">
-            <div class="container mx-auto px-4 section-animate">
+            <div class="container mx-auto px-4 ">
                 <div
                     class="liquid-glass p-8 md:p-12 max-w-4xl mx-auto border-green-500/20 hover:border-green-500/40 hover:shadow-[0_0_30px_rgba(0,255,65,0.1)] transition-all duration-500">
                     <h2 class="section-title text-green-500 drop-shadow-[0_0_10px_rgba(0,255,65,0.3)]">EXECUTION PLAN
@@ -727,7 +693,7 @@
     <canvas id="matrixCanvas" class="fixed top-0 left-0 w-full h-full -z-10"></canvas>
 
     <script src="matrix.js"></script>
-    <script src="app.js?v=PrivacyUpdate_2.0"></script>
+    <script src="app.js"></script>
 </body>
 
 </html>
