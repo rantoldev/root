@@ -1,8 +1,8 @@
 # ROOT 🧬
 
-> A high-fidelity, privacy-focused terminal ecosystem for the $TERM token.
+> A high-fidelity, privacy-focused terminal ecosystem for the $ROOT token on  - .
 
-ROOT is an immersive Matrix-inspired dashboard designed for the $TERM community. It combines real-time crypto integrations with a premium cyberpunk aesthetic to provide a unique monitoring experience.
+ROOT is an immersive  dashboard designed for the $ROOT community. It combines real-time crypto integrations with a premium cyberpunk aesthetic to provide a unique monitoring experience.
 
 ## ✨ Key Features
 
@@ -11,26 +11,10 @@ ROOT is an immersive Matrix-inspired dashboard designed for the $TERM community.
 - **Premium UI**: Glassmorphism, custom typography, and fluid micro-animations.
 - **Secure Architecture**: Built with privacy and anonymity at its core.
 
-## 🚀 Quick Start
-
-1. **Clone the Repo**
-   ```bash
-   git clone https://github.com/rantoldev/root.git
-   ```
-
-2. **Run Locally**
-   Simply open `index.html` in any modern browser or use a local server:
-   ```bash
-   npx http-server
-   ```
-
-3. **Deploy**
-   Optimized for deployment on Vercel, Netlify, or Cloudflare Pages.
 
 ## 🔗 Links
 
-- **Website**: [rantol.dev](https://rantol.dev)
-- **Token**: [$TERM](https://pump.fun/profile/rantoldev)
+- **Token**: [$ROOT](https://pump.fun/profile/rantoldev)
 
 ---
 
