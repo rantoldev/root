@@ -237,5 +237,77 @@ setInterval(() => {
 }, 3000);
 
 // Start
-document.addEventListener('DOMContentLoaded', initSystem);
+// 5. Scroll Interaction & Observer
+function initScrollObserver() {
+    console.log("Initializing Scroll Observer...");
+    const sections = document.querySelectorAll('main, section');
+    const indicator = document.getElementById('page-indicator');
+
+    if (!sections.length || !indicator) {
+        console.error("Scroll Observer Error: Sections or Indicator not found", { sections, indicator });
+        return;
+    }
+
+    // Scramble Text Effect
+    let scrambleInterval;
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*";
+
+    function setScrambleText(el, finalCheck) {
+        if (!el) return;
+        let iterations = 0;
+
+        clearInterval(scrambleInterval);
+
+        scrambleInterval = setInterval(() => {
+            el.innerText = finalCheck
+                .split("")
+                .map((letter, index) => {
+                    if (index < iterations) {
+                        return finalCheck[index];
+                    }
+                    return chars[Math.floor(Math.random() * chars.length)];
+                })
+                .join("");
+
+            if (iterations >= finalCheck.length) {
+                clearInterval(scrambleInterval);
+            }
+
+            iterations += 1 / 3; // Speed of resolve
+        }, 30);
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                // Activate Section
+                entry.target.classList.add('active-section');
+
+                // Update Header
+                const title = entry.target.getAttribute('data-title');
+                if (title) {
+                    setScrambleText(indicator, title);
+                }
+            } else {
+                // Optional: Re-trigger animation when scrolling back
+                entry.target.classList.remove('active-section');
+            }
+        });
+    }, {
+        threshold: 0.3 // Trigger when 30% visible
+    });
+
+    sections.forEach(sec => observer.observe(sec));
+}
+
+// Start
+document.addEventListener('DOMContentLoaded', () => {
+    initSystem();
+    initScrollObserver();
+
+    // Force notification to confirm update
+    setTimeout(() => {
+        showToast("SYSTEM UPDATED v2.1: INTERFACE RELOADED");
+    }, 2000);
+});
 

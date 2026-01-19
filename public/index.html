@@ -33,22 +33,33 @@
             --glass-highlight: rgba(255, 255, 255, 0.2);
         }
 
-        html {
-            scroll-behavior: smooth;
-        }
-
         body {
             font-family: 'Source Code Pro', monospace;
             background-color: #050505;
             color: #eee;
+            margin: 0;
+            padding: 0;
             overflow-x: hidden;
-            overflow-y: auto;
-            /* Enable scrolling */
+            /* Scroll Snap Configuration */
+            height: 100vh;
+            overflow-y: scroll;
+            scroll-behavior: smooth;
+            scroll-snap-type: y mandatory;
+            scroll-padding-top: 80px;
+            /* Header height offset */
+
             cursor: none !important;
             /* Force hide system cursor */
             background-image: radial-gradient(circle at 50% 50%, #111 0%, #000 100%);
             background-attachment: fixed;
             /* Parallax effect base */
+        }
+
+        /* Ensure HTML takes full height for body scroll to work */
+        html {
+            height: 100%;
+            overflow: hidden;
+            /* Let body handle scrolling */
         }
 
         /* Enforce no cursor on interactables */
@@ -209,15 +220,69 @@
             background: rgba(255, 255, 255, 0.2);
         }
 
-        /* Section Styling */
-        section {
-            padding: 4rem 1rem;
-            min-height: 80vh;
+        /* Section Styling - Robust Scroll Snap */
+        section,
+        main {
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+            min-height: 100vh;
+            /* Full viewport height */
+            height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
             z-index: 10;
+            padding-top: 80px;
+            /* Account for fixed header visually */
+            box-sizing: border-box;
+        }
+
+        section {
+            padding: 0;
+            /* Remove padding as we center content in full height */
+        }
+
+        /* Animation classes */
+        .section-animate {
+            opacity: 0;
+            filter: blur(10px);
+            transform: scale(0.95) translateY(30px);
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .active-section .section-animate {
+            opacity: 1;
+            filter: blur(0);
+            transform: scale(1) translateY(0);
+        }
+
+        /* Page Indicator - Centered in Header */
+        #page-indicator {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Source Code Pro', monospace;
+            font-weight: 800;
+            /* Bold */
+            font-size: 1.1rem;
+            color: #ffffff;
+            /* White Font */
+            text-transform: uppercase;
+            letter-spacing: 0.1rem;
+            pointer-events: none;
+            z-index: 100;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            /* Shadow for legibility */
+            white-space: nowrap;
+        }
+
+        @media (max-width: 1024px) {
+            #page-indicator {
+                display: none;
+                /* Prevent overlap with logo/nav on mobile */
+            }
         }
 
         .section-title {
@@ -304,7 +369,10 @@
     <!-- Glass Header -->
     <header
         class="fixed top-0 left-0 w-full z-50 p-4 transition-all duration-300 hover:bg-black/40 backdrop-blur-md border-b border-green-500/10">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
+        <div class="max-w-7xl mx-auto flex justify-between items-center relative">
+            <!-- Dynamic Page Name Indicator -->
+            <div id="page-indicator">root@system:~</div>
+
             <!-- Logo -->
             <a href="#terminal-section" class="flex items-center space-x-3 group">
                 <div class="relative">
@@ -355,12 +423,12 @@
     <div class="relative pt-20"> <!-- Padding for fixed header -->
 
         <!-- SECTION 1: TERMINAL (HERO) -->
-        <main id="terminal-section"
-            class="min-h-screen flex items-center justify-center p-4 relative z-10 perspective-1000">
+        <main id="terminal-section" data-title="root@system:~"
+            class="min-h-screen flex items-center justify-center p-4 relative z-10 perspective-1000 section-animate">
 
             <!-- Main Glass Terminal Window -->
             <div id="data-glass-panel"
-                class="liquid-glass w-full max-w-5xl h-[75vh] flex flex-col p-1 transition-transform duration-100 ease-out preserve-3d border-green-500/10 hover:shadow-[0_0_50px_rgba(0,255,65,0.05)]">
+                class="liquid-glass w-full max-w-5xl h-[75vh] flex flex-col p-1 transition-transform duration-100 ease-out preserve-3d border-green-500/10 hover:shadow-[0_0_50px_rgba(0,255,65,0.05)] section-animate">
 
                 <!-- Window Header / Controls -->
                 <div
@@ -434,8 +502,9 @@
         </main>
 
         <!-- SECTION 2: SYSTEM ARCHITECTURE (ABOUT) -->
-        <section id="about">
-            <div class="container mx-auto px-4">
+        <!-- SECTION 2: SYSTEM ARCHITECTURE (ABOUT) -->
+        <section id="about" data-title="SYSTEM ARCHITECTURE">
+            <div class="container mx-auto px-4 section-animate">
                 <div
                     class="liquid-glass p-8 md:p-12 max-w-4xl mx-auto border-green-500/20 hover:border-green-500/40 hover:shadow-[0_0_30px_rgba(0,255,65,0.1)] transition-all duration-500">
                     <h2 class="section-title text-green-500 drop-shadow-[0_0_10px_rgba(0,255,65,0.3)]">SYSTEM
@@ -475,8 +544,8 @@
         </section>
 
         <!-- SECTION 3: TOKENOMICS -->
-        <section id="tokenomics">
-            <div class="container mx-auto px-4">
+        <section id="tokenomics" data-title="RESOURCE ALLOCATION">
+            <div class="container mx-auto px-4 section-animate">
                 <div
                     class="liquid-glass p-8 md:p-12 max-w-5xl mx-auto border-green-500/20 hover:border-green-500/40 hover:shadow-[0_0_30px_rgba(0,255,65,0.1)] transition-all duration-500">
                     <h2 class="section-title text-green-500 drop-shadow-[0_0_10px_rgba(0,255,65,0.3)]">RESOURCE
@@ -524,8 +593,8 @@
         </section>
 
         <!-- SECTION 4: ROADMAP -->
-        <section id="roadmap" class="mb-20">
-            <div class="container mx-auto px-4">
+        <section id="roadmap" class="mb-20" data-title="EXECUTION PLAN">
+            <div class="container mx-auto px-4 section-animate">
                 <div
                     class="liquid-glass p-8 md:p-12 max-w-4xl mx-auto border-green-500/20 hover:border-green-500/40 hover:shadow-[0_0_30px_rgba(0,255,65,0.1)] transition-all duration-500">
                     <h2 class="section-title text-green-500 drop-shadow-[0_0_10px_rgba(0,255,65,0.3)]">EXECUTION PLAN
