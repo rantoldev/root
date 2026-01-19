@@ -199,12 +199,8 @@ if (btnSnipe) {
 
 if (btnCopy) {
     btnCopy.addEventListener('click', () => {
-        if (GLOBAL_PUMP_CA) {
-            navigator.clipboard.writeText(GLOBAL_PUMP_CA).then(() => {
-                showToast("ADDRESS COPIED");
-                addToTerminal(`COPIED ADDRESS: ${GLOBAL_PUMP_CA}`, "success");
-            }).catch(console.error);
-        }
+        window.open('https://pump.fun/profile/rantoldev', '_blank');
+        addToTerminal("> REDIRECTING TO CORE PROFILE...", "success");
     });
 }
 
@@ -212,6 +208,14 @@ if (btnClear) {
     btnClear.addEventListener('click', () => {
         terminalOutput.innerHTML = '';
         addToTerminal("LOGS CLEARED.", "info");
+    });
+}
+
+const btnTokenCA = document.getElementById('tokenCA-section');
+if (btnTokenCA) {
+    btnTokenCA.addEventListener('click', () => {
+        window.open('https://pump.fun/profile/rantoldev', '_blank');
+        showToast("REDIRECTING TO PROFILE");
     });
 }
 
